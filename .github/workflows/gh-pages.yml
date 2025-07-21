@@ -23,9 +23,11 @@ jobs:
         run: npm run export
 
       - name: Commit and Push docs folder
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add docs
           git commit -m "Auto-update docs folder [skip ci]" || echo "No changes to commit"
-          git push
+          git push https://x-access-token:${PAT_TOKEN}@github.com/nishant-iith/ubuntu-portfolio.git HEAD:main
