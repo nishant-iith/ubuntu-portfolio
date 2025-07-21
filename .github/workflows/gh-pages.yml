@@ -31,9 +31,9 @@ jobs:
           mv docs ../docs-temp
           git fetch origin gh-pages || true
           git switch --orphan gh-pages
-          git rm -rf .
-          cp -r ../docs-temp/* .
+          git rm -rf . || true
+          cp -r ../docs-temp/. .
           rm -rf ../docs-temp
-          git add .
+          git add . || true
           git commit -m "Deploy to GitHub Pages [skip ci]" || echo "No changes to commit"
           git push --force https://x-access-token:${PAT_TOKEN}@github.com/nishant-iith/ubuntu-portfolio.git gh-pages
