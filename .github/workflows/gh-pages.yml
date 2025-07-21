@@ -28,6 +28,10 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs
-          git commit -m "Auto-update docs folder [skip ci]" || echo "No changes to commit"
-          git push https://x-access-token:${PAT_TOKEN}@github.com/nishant-iith/ubuntu-portfolio.git HEAD:main
+          git fetch origin gh-pages || true
+          git switch --orphan gh-pages
+          git rm -rf .
+          cp -r docs/* .
+          git add .
+          git commit -m "Deploy to GitHub Pages [skip ci]" || echo "No changes to commit"
+          git push --force https://x-access-token:${PAT_TOKEN}@github.com/nishant-iith/ubuntu-portfolio.git gh-pages
