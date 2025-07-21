@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const repo = 'ubuntu-portfolio';
+
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
@@ -47,7 +49,12 @@ const nextConfig = {
   // Environment variables validation
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
-  }
+  },
+
+  output: 'export',
+  // If deploying to https://username.github.io/repo-name/
+  basePath: '/'+repo,
+  assetPrefix: '/'+repo+'/',
 }
 
 module.exports = nextConfig
