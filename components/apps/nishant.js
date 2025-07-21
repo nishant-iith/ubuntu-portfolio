@@ -137,14 +137,17 @@ const About = () => {
                             />
                         </div>
                         <div className="flex gap-4 mt-2">
-                            <a href="mailto:iith.nishant@gmail.com" title="Email" className="hover:scale-110 transition-transform">
-                                <img src="./themes/Yaru/status/mail.svg" alt="email" className="w-6 h-6" />
+                            <a href="mailto:iith.nishant@gmail.com" title="Email" className="hover:scale-110 transition-transform" target="_blank" rel="noopener noreferrer">
+                                <img src="./themes/Yaru/status/mail.svg" alt="email" className="w-7 h-7" />
                             </a>
                             <a href="https://github.com/nishant-iith" target="_blank" rel="noopener noreferrer" title="GitHub" className="hover:scale-110 transition-transform">
-                                <img src="./themes/Yaru/apps/github.png" alt="github" className="w-6 h-6" />
+                                <img src="./themes/Yaru/apps/github.png" alt="github" className="w-7 h-7" />
+                            </a>
+                            <a href="https://www.linkedin.com/in/nishant-iith/" target="_blank" rel="noopener noreferrer" title="LinkedIn" className="hover:scale-110 transition-transform">
+                                <img src="./themes/Yaru/apps/linkedin.svg" alt="linkedin" className="w-7 h-7" />
                             </a>
                             <a href="tel:+919780788073" title="Phone" className="hover:scale-110 transition-transform">
-                                <img src="./themes/Yaru/status/phone.svg" alt="phone" className="w-6 h-6" />
+                                <img src="./themes/Yaru/status/phone.svg" alt="phone" className="w-7 h-7" />
                             </a>
                         </div>
                         {/* Download Resume */}
@@ -152,7 +155,7 @@ const About = () => {
                             href="/resume.pdf"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="mt-4 px-4 py-1.5 rounded-full bg-gradient-to-r from-[#E95420] to-[#2CBB6B] text-white font-semibold text-xs shadow hover:opacity-90 transition-all"
+                            className="mt-4 px-4 py-1.5 rounded-full bg-[#E95420] text-white font-semibold text-xs shadow hover:opacity-90 transition-all"
                         >
                             Download Resume
                         </a>
@@ -160,35 +163,33 @@ const About = () => {
                     {/* Main Info */}
                     <div className="flex-1">
                         <h1 className="text-4xl font-bold text-[#E95420] mb-1 tracking-tight">Nishant</h1>
-                        <h2 className="text-lg md:text-xl text-[#2CBB6B] font-semibold mb-1">B.Tech Biomedical Engineering @ IIT Hyderabad</h2>
-                        <h3 className="text-base md:text-lg text-[#b0b0b0] mb-4">Double Major in Entrepreneurship &nbsp;|&nbsp; Minor in Economics</h3>
+                        <h2 className="text-lg md:text-xl text-[#E95420] font-semibold mb-1">B.Tech Biomedical Engineering @ IIT Hyderabad</h2>
+                        <h3 className="text-base md:text-lg text-[#b0b0b0] mb-4">Passionate about software, AI, and making things better.</h3>
                         <div className="flex flex-wrap gap-2 mb-4">
-                            <span className="bg-[#E95420] bg-opacity-90 text-white px-3 py-1 rounded-full text-xs font-semibold">Software Engineering</span>
-                            <span className="bg-[#2CBB6B] bg-opacity-90 text-white px-3 py-1 rounded-full text-xs font-semibold">Machine Learning</span>
-                            <span className="bg-[#3B82F6] bg-opacity-90 text-white px-3 py-1 rounded-full text-xs font-semibold">Biomedical Tech</span>
-                            <span className="bg-[#191b1f] text-[#b0b0b0] px-3 py-1 rounded-full text-xs font-semibold border border-[#35363a]">Campus Leader</span>
+                            <span className="bg-[#E95420] text-white px-3 py-1 rounded-full text-xs font-semibold">Software Engineering</span>
+                            <span className="bg-[#E95420] text-white px-3 py-1 rounded-full text-xs font-semibold">Machine Learning</span>
                         </div>
                         <p className="text-[#e0e0e0] leading-relaxed mb-3">
-                            Hi! I'm Nishant, a passionate technologist and problem solver. My journey at IIT Hyderabad has been a blend of engineering, entrepreneurship, and economics, giving me a unique perspective on technology's impact in the real world.
+                            Hi! I'm Nishant, a tech enthusiast who loves solving real-world problems. At IIT Hyderabad, I've explored engineering and entrepreneurship, which has helped me understand how technology can truly make a difference.
                         </p>
                         <ul className="list-disc ml-6 text-[#d1d5db] mb-3">
                             <li>
                                 Interned at <span className="font-semibold text-[#E95420]">Goldman Sachs</span> and <span className="font-semibold text-[#E95420]">Pentakod</span>, building scalable software solutions.
                             </li>
                             <li>
-                                Active as <span className="font-semibold text-[#2CBB6B]">Internship Coordinator</span> (OCS) and <span className="font-semibold text-[#2CBB6B]">Head of Operations</span> (Finance & Consulting Club).
+                                Active as <span className="font-semibold text-[#E95420]">Internship Coordinator</span> (OCS) and <span className="font-semibold text-[#E95420]">Head of Operations</span> (Finance & Consulting Club).
                             </li>
                             <li>
-                                Love working on AI, automation, and biomedical applications.
+                                I enjoy working on AI, automation, and practical tech applications.
                             </li>
                         </ul>
                         <p className="text-[#e0e0e0] leading-relaxed mb-3">
-                            I thrive in collaborative environments and enjoy taking on leadership roles to drive impactful projects. My technical toolkit includes C++, Python, React, and a growing expertise in data science and ML.
+                            I thrive in collaborative teams and enjoy leading projects that have a real impact. My main tools are C++, Python, and React, and I'm always learning more about data science and machine learning.
                         </p>
                         <div className="flex flex-wrap gap-2 mt-4">
-                            <span className="bg-[#3B82F6] bg-opacity-90 text-white px-3 py-1 rounded-full text-xs">#Teamwork</span>
-                            <span className="bg-[#E95420] bg-opacity-90 text-white px-3 py-1 rounded-full text-xs">#Innovation</span>
-                            <span className="bg-[#2CBB6B] bg-opacity-90 text-white px-3 py-1 rounded-full text-xs">#ContinuousLearning</span>
+                            <span className="bg-[#35363a] text-white px-3 py-1 rounded-full text-xs">#Teamwork</span>
+                            <span className="bg-[#35363a] text-white px-3 py-1 rounded-full text-xs">#Innovation</span>
+                            <span className="bg-[#35363a] text-white px-3 py-1 rounded-full text-xs">#ContinuousLearning</span>
                         </div>
                     </div>
                 </Card>
@@ -199,15 +200,15 @@ const About = () => {
                         <span className="text-xs text-[#b0b0b0]">CGPA</span>
                     </Card>
                     <Card className="flex flex-col items-center">
-                        <span className="text-2xl font-bold text-[#2CBB6B]">2</span>
-                        <span className="text-xs text-[#b0b0b0]">Majors</span>
+                        <span className="text-2xl font-bold text-[#E95420]">1</span>
+                        <span className="text-xs text-[#b0b0b0]">Major</span>
                     </Card>
                     <Card className="flex flex-col items-center">
-                        <span className="text-2xl font-bold text-[#3B82F6]">2</span>
+                        <span className="text-2xl font-bold text-[#E95420]">2</span>
                         <span className="text-xs text-[#b0b0b0]">Internships</span>
                     </Card>
                     <Card className="flex flex-col items-center">
-                        <span className="text-2xl font-bold text-[#e0e0e0]">5+</span>
+                        <span className="text-2xl font-bold text-[#E95420]">5+</span>
                         <span className="text-xs text-[#b0b0b0]">Projects</span>
                     </Card>
                 </div>
@@ -219,31 +220,16 @@ const About = () => {
 const Education = () => {
     const educationData = [
         {
-            year: "2026",
             degree: "B.Tech in Biomedical Engineering",
             institute: "IIT Hyderabad",
             grade: "8.27 CGPA"
         },
         {
-            year: "2026",
-            degree: "Double Major in Entrepreneurship",
-            institute: "IIT Hyderabad",
-            grade: "N.A"
-        },
-        {
-            year: "2026",
-            degree: "Minor in Economics",
-            institute: "IIT Hyderabad",
-            grade: "N.A"
-        },
-        {
-            year: "2021",
             degree: "XII (Central Board of Secondary Education)",
             institute: "Godwin Public Senior Secondary School",
             grade: "92.2%"
         },
         {
-            year: "2019",
             degree: "X (Central Board of Secondary Education)",
             institute: "Godwin Public Senior Secondary School",
             grade: "93.2%"
@@ -258,7 +244,7 @@ const Education = () => {
                     <table className="w-full rounded-lg">
                         <thead className="bg-[#E95420] text-white">
                             <tr>
-                                <th className="px-6 py-3 text-left">Year</th>
+                                {/* Removed Year */}
                                 <th className="px-6 py-3 text-left">Degree</th>
                                 <th className="px-6 py-3 text-left">Institute</th>
                                 <th className="px-6 py-3 text-left">CGPA/Marks(%)</th>
@@ -267,7 +253,7 @@ const Education = () => {
                         <tbody>
                             {educationData.map((item, index) => (
                                 <tr key={index} className={index % 2 === 0 ? "bg-[#232526] bg-opacity-80" : "bg-[#191b1f] bg-opacity-80"}>
-                                    <td className="px-6 py-4 text-[#e0e0e0]">{item.year}</td>
+                                    {/* Removed Year */}
                                     <td className="px-6 py-4 text-[#e0e0e0]">{item.degree}</td>
                                     <td className="px-6 py-4 text-[#e0e0e0]">{item.institute}</td>
                                     <td className="px-6 py-4 text-[#E95420] font-semibold">{item.grade}</td>

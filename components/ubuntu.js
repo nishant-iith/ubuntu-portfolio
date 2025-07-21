@@ -42,7 +42,7 @@ export default class Ubuntu extends Component {
 	setTimeOutBootScreen = () => {
 		setTimeout(() => {
 			this.setState({ booting_screen: false });
-		}, 4000); // increased for longer Ubuntu boot feel
+		}, 4000);
 	};
 
 	getLocalData = () => {
