@@ -130,7 +130,7 @@ const About = () => {
                     <div className="flex flex-col items-center">
                         <div className="w-36 h-36 md:w-44 md:h-44 bg-[#191b1f] bg-opacity-80 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg border-4 border-[#232526] mb-4 transition-all duration-200 hover:scale-105">
                             <img
-                                src="./images/profile/profile-nishant.jpg"
+                                src="/images/logos/bitmoji.png"
                                 alt="Nishant"
                                 className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-2 border-[#E95420] shadow"
                                 onError={e => { e.target.onerror = null; e.target.src = "https://ui-avatars.com/api/?name=Nishant&background=E95420&color=fff&size=200"; }}
@@ -138,16 +138,16 @@ const About = () => {
                         </div>
                         <div className="flex gap-4 mt-2">
                             <a href="mailto:iith.nishant@gmail.com" title="Email" className="hover:scale-110 transition-transform" target="_blank" rel="noopener noreferrer">
-                                <img src="./themes/Yaru/status/mail.svg" alt="email" className="w-7 h-7" />
+                                <img src="/images/logos/email.svg" alt="email" className="w-7 h-7" />
                             </a>
                             <a href="https://github.com/nishant-iith" target="_blank" rel="noopener noreferrer" title="GitHub" className="hover:scale-110 transition-transform">
-                                <img src="./themes/Yaru/apps/github.png" alt="github" className="w-7 h-7" />
+                                <img src="/images/logos/github.png" alt="github" className="w-7 h-7" />
                             </a>
                             <a href="https://www.linkedin.com/in/nishant-iith/" target="_blank" rel="noopener noreferrer" title="LinkedIn" className="hover:scale-110 transition-transform">
-                                <img src="./themes/Yaru/apps/linkedin.svg" alt="linkedin" className="w-7 h-7" />
+                                <img src="/images/logos/linkedin.svg" alt="linkedin" className="w-7 h-7" />
                             </a>
                             <a href="tel:+919780788073" title="Phone" className="hover:scale-110 transition-transform">
-                                <img src="./themes/Yaru/status/phone.svg" alt="phone" className="w-7 h-7" />
+                                <img src="/images/logos/phone.svg" alt="phone" className="w-7 h-7" />
                             </a>
                         </div>
                         {/* Download Resume */}
@@ -174,21 +174,23 @@ const About = () => {
                         </p>
                         <ul className="list-disc ml-6 text-[#d1d5db] mb-3">
                             <li>
-                                Interned at <span className="font-semibold text-[#E95420]">Goldman Sachs</span> and <span className="font-semibold text-[#E95420]">Pentakod</span>, building scalable software solutions.
+                                {/* Interned at <span className="font-semibold text-[#E95420]">Goldman Sachs</span> and <span className="font-semibold text-[#E95420]">Pentakod</span>, building scalable software solutions. */}
+                                Point 1
                             </li>
                             <li>
-                                Active as <span className="font-semibold text-[#E95420]">Internship Coordinator</span> (OCS) and <span className="font-semibold text-[#E95420]">Head of Operations</span> (Finance & Consulting Club).
+                                {/* Active as <span className="font-semibold text-[#E95420]">Internship Coordinator</span> (OCS) and <span className="font-semibold text-[#E95420]">Head of Operations</span> (Finance & Consulting Club). */}
+                                Point 2
                             </li>
                             <li>
-                                I enjoy working on AI, automation, and practical tech applications.
+                                Point 3
                             </li>
                         </ul>
                         <p className="text-[#e0e0e0] leading-relaxed mb-3">
-                            I thrive in collaborative teams and enjoy leading projects that have a real impact. My main tools are C++, Python, and React, and I'm always learning more about data science and machine learning.
+                            About me.
                         </p>
                         <div className="flex flex-wrap gap-2 mt-4">
                             <span className="bg-[#35363a] text-white px-3 py-1 rounded-full text-xs">#Teamwork</span>
-                            <span className="bg-[#35363a] text-white px-3 py-1 rounded-full text-xs">#Innovation</span>
+                            <span className="bg-[#35363a] text-white px-3 py-1 rounded-full text-xs">#Problem Solving</span>
                             <span className="bg-[#35363a] text-white px-3 py-1 rounded-full text-xs">#ContinuousLearning</span>
                         </div>
                     </div>
