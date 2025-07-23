@@ -3,6 +3,8 @@ import { displaySettings } from './components/apps/settings';
 import { displayGedit } from './components/apps/gedit';
 import { displayTerminalCalc } from './components/apps/calc';
 import { displayAboutNishant } from './components/apps/nishant';
+import FlameApp from './components/apps/flame.js';
+const displayFlame = (props) => <FlameApp {...props} />;
 
 const apps = [
     {
@@ -31,6 +33,15 @@ const apps = [
         favourite: true,
         desktop_shortcut: false,
         screen: displayTerminal,
+    },
+    {
+        id: "api-sandbox",
+        title: "API Sandbox",
+        icon: './themes/Yaru/apps/api-sandbox.svg',
+        disabled: false,
+        favourite: true,
+        desktop_shortcut: true,
+        screen: displayFlame,
     },
     {
         id: "settings",

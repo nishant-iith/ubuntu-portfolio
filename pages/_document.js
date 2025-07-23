@@ -15,6 +15,7 @@ class MyDocument extends Document {
                     <meta httpEquiv="X-Frame-Options" content="DENY" />
                     <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
                     <meta httpEquiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+                <link rel="icon" type="image/svg+xml" href="/fevicon.svg" />
                 </Head>
                 <body>
                     <Main />
