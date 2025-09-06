@@ -1,12 +1,278 @@
-/* Stronger focus indication for focused window */
+/* Ubuntu Window Styling */
 .opened-window.z-30 {
-    box-shadow: 0 0 0 2px #E95420, 0 8px 32px 0 rgba(0,0,0,0.25);
-    border: 2px solid #E95420;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.8), inset 0 1px 0 rgba(255,255,255,0.9);
+    border: 1px solid #BBBBBB;
+    border-radius: 8px 8px 6px 6px;
     z-index: 30;
+    background: linear-gradient(to bottom, #FAFAFA 0%, #F0F0F0 100%);
+    overflow: hidden;
 }
+
+/* Ubuntu Window Title Bar */
+.ubuntu-window-titlebar {
+    background: linear-gradient(to bottom, #F0F0F0 0%, #E8E8E8 50%, #DDDDDD 100%);
+    border-bottom: 1px solid #CCCCCC;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 32px;
+}
+
+/* Ubuntu Window Controls (Close, Minimize, Maximize) */
+.ubuntu-window-controls {
+    display: flex;
+    gap: 6px;
+}
+
+.ubuntu-window-control {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.15);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.ubuntu-window-control:hover {
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 1px 3px rgba(0,0,0,0.15);
+    transform: scale(1.1);
+}
+
+.ubuntu-window-control-close {
+    background: linear-gradient(to bottom, #F46969 0%, #E53E3E 100%);
+}
+
+.ubuntu-window-control-minimize {
+    background: linear-gradient(to bottom, #FBD38D 0%, #ED8936 100%);
+}
+
+.ubuntu-window-control-maximize {
+    background: linear-gradient(to bottom, #68D391 0%, #38A169 100%);
+}
+
+/* Ubuntu Window Content */
+.ubuntu-window-content {
+    background: #FFFFFF;
+    flex: 1;
+    overflow: hidden;
+}
+
 body{
-    font-family: 'Ubuntu', sans-serif;
-    font-display: swap
+    font-family: 'Ubuntu', 'Cantarell', 'Open Sans', 'Helvetica Neue', system-ui, sans-serif;
+    font-display: swap;
+    background: #2C2C2C;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* Ubuntu Global Typography */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ubuntu Selection Colors */
+::selection {
+    background: #E95420;
+    color: white;
+}
+
+::-moz-selection {
+    background: #E95420;
+    color: white;
+}
+
+/* Ubuntu Focus Ring */
+*:focus {
+    outline: 2px solid #E95420;
+    outline-offset: 2px;
+}
+
+/* Ubuntu Scrollbars */
+::-webkit-scrollbar {
+    width: 12px;
+    background: #F0F0F0;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #DDDDDD, #CCCCCC);
+    border-radius: 6px;
+    border: 1px solid #BBBBBB;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, #E8E8E8, #D8D8D8);
+}
+
+::-webkit-scrollbar-track {
+    background: #F0F0F0;
+    border-radius: 6px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Ubuntu Terminal Styling */
+.ubuntu-terminal {
+    background: linear-gradient(135deg, #2C001E 0%, #21001A 100%);
+    font-family: 'Ubuntu Mono', 'Consolas', 'Monaco', monospace;
+    line-height: 1.4;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+
+.ubuntu-terminal::-webkit-scrollbar {
+    width: 8px;
+    background: rgba(255,255,255,0.1);
+}
+
+.ubuntu-terminal::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3);
+    border-radius: 4px;
+}
+
+.ubuntu-terminal::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.5);
+}
+
+/* Terminal text selection */
+.ubuntu-terminal ::selection {
+    background: rgba(233, 84, 32, 0.3);
+    color: inherit;
+}
+
+.ubuntu-terminal ::-moz-selection {
+    background: rgba(233, 84, 32, 0.3);
+    color: inherit;
+}
+
+/* Ubuntu Panel/Dock Styling */
+.ubuntu-panel {
+    background: linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.9));
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Ubuntu Window Title Bar */
+.window-title-bar {
+    background: linear-gradient(to bottom, #3C3C3C, #2C2C2C);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Ubuntu Button Styling */
+.ubuntu-button {
+    background: linear-gradient(to bottom, #F0F0F0, #E0E0E0);
+    border: 1px solid #CCCCCC;
+    border-radius: 4px;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.ubuntu-button:hover {
+    background: linear-gradient(to bottom, #F8F8F8, #E8E8E8);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.ubuntu-button:active {
+    background: linear-gradient(to bottom, #E0E0E0, #D0D0D0);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* Ubuntu Orange Button */
+.ubuntu-button-orange {
+    background: linear-gradient(to bottom, #FF6B35, #E95420);
+    border: 1px solid #D44414;
+    color: white;
+    text-shadow: 0 -1px 0 rgba(0,0,0,0.3);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.ubuntu-button-orange:hover {
+    background: linear-gradient(to bottom, #FF8B55, #FF6B35);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 1px 3px rgba(0,0,0,0.25);
+}
+
+.ubuntu-button-orange:active {
+    background: linear-gradient(to bottom, #D44414, #B8340E);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* Ubuntu Desktop Icon Styling */
+.ubuntu-desktop-icon {
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+    backdrop-filter: blur(2px);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ubuntu-desktop-icon:hover {
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.1) 70%);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.4);
+    backdrop-filter: blur(8px);
+    transform: translateY(-2px) scale(1.05);
+}
+
+.ubuntu-desktop-icon:active {
+    transform: translateY(0px) scale(1.02);
+    transition-duration: 0.1s;
+}
+
+.ubuntu-desktop-icon img {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+    transition: filter 0.3s ease;
+}
+
+.ubuntu-desktop-icon:hover img {
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5));
+}
+
+/* Ubuntu Dock/Panel Styling */
+.ubuntu-dock-app {
+    position: relative;
+    backdrop-filter: blur(4px);
+    transition: all 0.2s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.ubuntu-dock-app:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+    transform: translateX(2px) scale(1.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.ubuntu-dock-app img {
+    transition: all 0.2s ease;
+    filter: brightness(0.9) contrast(1.1);
+}
+
+.ubuntu-dock-app:hover img {
+    filter: brightness(1) contrast(1.2);
+}
+
+/* Ubuntu Tooltip */
+.ubuntu-tooltip {
+    opacity: 1;
+    transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+    z-index: 1000;
+}
+
+.ubuntu-tooltip.invisible {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.ubuntu-tooltip:before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -4px;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 4px 4px 4px 0;
+    border-color: transparent rgba(0,0,0,0.8) transparent transparent;
 }
 
 /* Top NavBar styling */
@@ -63,6 +329,55 @@ input[type=range].ubuntu-slider::-webkit-slider-thumb {
     width: 12px;
     height: 12px;
     position: relative;
+}
+
+/* Ubuntu Window Animations */
+.window-enter {
+    animation: windowSlideIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform-origin: center bottom;
+}
+
+@keyframes windowSlideIn {
+    0% {
+        transform: scale(0.8) translateY(50px);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1) translateY(0px);
+        opacity: 1;
+    }
+}
+
+.window-minimize {
+    animation: windowMinimize 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes windowMinimize {
+    0% {
+        transform: scale(1) translateY(0px);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.1) translateY(100vh);
+        opacity: 0;
+    }
+}
+
+.window-maximize {
+    animation: windowMaximize 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes windowMaximize {
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(1);
+        width: 100vw !important;
+        height: 100vh !important;
+        top: 0 !important;
+        left: 0 !important;
+    }
 }
 
 /* Window's styling */

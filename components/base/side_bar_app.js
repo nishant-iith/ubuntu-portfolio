@@ -40,7 +40,7 @@ export class SideBarApp extends Component {
                 onMouseLeave={() => {
                     this.setState({ showTitle: false });
                 }}
-                className={(this.props.isClose[this.id] === false && this.props.isFocus[this.id] ? "bg-white bg-opacity-10 " : "") + " w-auto p-2 outline-none relative transition hover:bg-white hover:bg-opacity-10 rounded m-1"}
+                className={(this.props.isClose[this.id] === false && this.props.isFocus[this.id] ? "bg-white bg-opacity-20 border-l-2 border-ub-orange " : "") + " ubuntu-dock-app w-auto p-2 outline-none relative transition-all duration-200 hover:bg-white hover:bg-opacity-15 rounded-md m-1 cursor-pointer"}
                 id={"sidebar-" + this.props.id}
             >
                 <img width="28px" height="28px" className="w-7" src={this.props.icon} alt="Ubuntu App Icon" />
@@ -48,14 +48,14 @@ export class SideBarApp extends Component {
                 {
                     (
                         this.props.isClose[this.id] === false
-                            ? <div className=" w-1 h-1 absolute left-0 top-1/2 bg-ub-orange rounded-sm"></div>
+                            ? <div className="w-1 h-6 absolute left-0 top-1/2 transform -translate-y-1/2 bg-ub-orange rounded-r-full shadow-lg"></div>
                             : null
                     )
                 }
                 <div
                     className={
                         (this.state.showTitle ? " visible " : " invisible ") +
-                        " w-max py-0.5 px-1.5 absolute top-1.5 left-full ml-3 m-1 text-ubt-grey text-opacity-90 text-sm bg-ub-grey bg-opacity-70 border-gray-400 border border-opacity-40 rounded-md"
+                        " ubuntu-tooltip w-max py-1 px-2 absolute top-1/2 transform -translate-y-1/2 left-full ml-3 text-white text-sm bg-black bg-opacity-80 border border-gray-600 border-opacity-60 rounded-md shadow-lg backdrop-blur-sm"
                     }
                 >
                     {this.props.title}

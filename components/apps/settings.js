@@ -1,7 +1,7 @@
-import React from 'react';
-import $ from 'jquery';
+import React, { useCallback } from 'react';
+import PropTypes from 'prop-types';
 
-export function Settings(props) {
+const Settings = React.memo(function Settings(props) {
     const wallpapers = {
         "wall-1": "./images/wallpapers/wall-1.webp",
         "wall-2": "./images/wallpapers/wall-2.webp",
@@ -13,9 +13,18 @@ export function Settings(props) {
         "wall-8": "./images/wallpapers/wall-8.webp",
     };
 
-    let changeBackgroundImage = (e) => {
-        props.changeBackgroundImage($(e.target).data("path"));
-    }
+    const changeBackgroundImage = useCallback((wallpaperPath) => {
+        if (props.changeBackgroundImage) {
+            props.changeBackgroundImage(wallpaperPath);
+        }
+    }, [props.changeBackgroundImage]);
+
+    const handleWallpaperSelect = useCallback((e) => {
+        const path = e.currentTarget.dataset.path;
+        if (path) {
+            changeBackgroundImage(path);
+        }
+    }, [changeBackgroundImage]);
 
     return (
         <div className={"w-full flex-col flex-grow z-20 max-h-full overflow-y-auto windowMainScreen select-none bg-ub-cool-grey"}>
@@ -24,19 +33,47 @@ export function Settings(props) {
             <div className="flex flex-wrap justify-center items-center border-t border-gray-900">
                 {
                     Object.keys(wallpapers).map((name, index) => {
+                        const isSelected = name === props.currBgImgName;
                         return (
-                            <div key={index} tabIndex="1" onFocus={changeBackgroundImage} data-path={name} className={((name === props.currBgImgName) ? " border-yellow-700 " : " border-transparent ") + " md:px-28 md:py-20 md:m-4 m-2 px-14 py-10 outline-none border-4 border-opacity-80"} style={{ backgroundImage: `url(${wallpapers[name]})`, backgroundSize: "cover", backgroundRepeat: "no-repeat", backgroundPosition: "center center" }}></div>
+                            <div 
+                                key={index} 
+                                tabIndex="0"
+                                role="button"
+                                aria-label={`Select wallpaper ${name}`}
+                                onClick={handleWallpaperSelect}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        handleWallpaperSelect(e);
+                                    }
+                                }}
+                                data-path={name} 
+                                className={`${isSelected ? "border-yellow-700" : "border-transparent"} md:px-28 md:py-20 md:m-4 m-2 px-14 py-10 outline-none border-4 border-opacity-80 cursor-pointer hover:border-yellow-400 transition-colors`} 
+                                style={{ 
+                                    backgroundImage: `url(${wallpapers[name]})`, 
+                                    backgroundSize: "cover", 
+                                    backgroundRepeat: "no-repeat", 
+                                    backgroundPosition: "center center" 
+                                }}
+                            />
                         );
                     })
                 }
             </div>
         </div>
-    )
-}
+    );
+});
 
-export default Settings
+Settings.propTypes = {
+    currBgImgName: PropTypes.string.isRequired,
+    changeBackgroundImage: PropTypes.func.isRequired,
+};
 
+Settings.displayName = 'Settings';
+
+export { Settings };
+export default Settings;
 
 export const displaySettings = () => {
-    return <Settings> </Settings>;
-}
+    return <Settings currBgImgName="wall-1" changeBackgroundImage={() => {}} />;
+};

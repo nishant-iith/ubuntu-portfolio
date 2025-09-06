@@ -10,22 +10,27 @@ const nextConfig = {
   // Performance optimizations
   compress: true,
   poweredByHeader: false,
+  trailingSlash: true, // Better for GitHub Pages
 
-  // Image optimization
+  // Image optimization for static export
   images: {
+    unoptimized: true, // Required for static export
     domains: [],
     formats: ['image/webp', 'image/avif'],
   },
 
   // Environment variables validation
   env: {
-    CUSTOM_KEY: process.env.CUSTOM_KEY,
+    CUSTOM_KEY: process.env.CUSTOM_KEY || '',
   },
 
-  output: 'export',
-  // If deploying to https://username.github.io/repo-name/
-  basePath: isProd ? '/' + repo : '',
-  assetPrefix: isProd ? '/' + repo + '/' : '',
+  // GitHub Pages compatible settings
+  ...(isProd && {
+    output: 'export',
+    distDir: 'docs',
+    basePath: '/' + repo,
+    assetPrefix: '/' + repo + '/',
+  }),
 }
 
 module.exports = nextConfig

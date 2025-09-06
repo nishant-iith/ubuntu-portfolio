@@ -1,302 +1,380 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import $ from 'jquery';
 import ReactGA from 'react-ga4';
 
-export class Terminal extends Component {
-    constructor() {
-        super();
-        this.cursor = "";
-        this.terminal_rows = 1;
-        this.current_directory = "~";
-        this.curr_dir_name = "root";
-        this.prev_commands = [];
-        this.commands_index = -1;
-        this.child_directories = {
-            root: ["education", "projects", "experience", "skills", "languages", "courses", "extracurricular", "contact"],
-            education: ["BTech_Biomedical_Engineering_IITH.txt", "Double_Major_Entrepreneurship_IITH.txt", "Minor_Economics_IITH.txt", "Class_XII_CBSE.txt", "Class_X_CBSE.txt"],
-            experience: ["Goldman_Sachs_Summer_Analyst_2025.txt", "Pentakod_Python_Developer_Intern_2024.txt"],
-            projects: ["Hybrid_CNN_LSTM_Emotion_Recognition.txt", "Data_Structures_Comparison.txt", "Route_Optimization_Tool.txt", "CPU_Scheduling_Algorithms.txt"],
-            skills: ["Programming_Languages.txt", "Development_Tools.txt", "Python_Libraries.txt", "Other_Tools.txt"],
-            languages: ["C", "C++", "Python", "SQL", "FORTRAN", "MATLAB", "VERILOG", "HTML", "CSS"],
-            courses: ["Computer_Science.txt", "Mathematics.txt", "Artificial_Intelligence.txt"],
-            extracurricular: ["NCC_Gold_Medal.txt", "Vishwakarma_Awards.txt", "Office_of_Career_Services.txt", "Finance_and_Consulting_Club.txt"],
-            contact: ["email.txt", "phone.txt", "github.txt"]
-        };
-        this.state = {
-            terminal: [],
-        }
-    }
+const Terminal = ({ addFolder, openApp }) => {
+    // Terminal state
+    const [history, setHistory] = useState([]);
+    const [currentInput, setCurrentInput] = useState('');
+    const [commandHistory, setCommandHistory] = useState([]);
+    const [historyIndex, setHistoryIndex] = useState(-1);
+    const [currentPath, setCurrentPath] = useState('~');
+    const [currentDir, setCurrentDir] = useState('root');
+    const [cursorVisible, setCursorVisible] = useState(true);
 
-    componentDidMount() {
-        this.reStartTerminal();
-    }
+    // Refs
+    const inputRef = useRef(null);
+    const terminalRef = useRef(null);
+    const cursorIntervalRef = useRef(null);
 
-    componentDidUpdate() {
-        clearInterval(this.cursor);
-        this.startCursor(this.terminal_rows - 2);
-    }
-
-    componentWillUnmount() {
-        clearInterval(this.cursor);
-    }
-
-    reStartTerminal = () => {
-        clearInterval(this.cursor);
-        $('#terminal-body').empty();
-        this.appendTerminalRow();
-    }
-
-    appendTerminalRow = () => {
-        let terminal = this.state.terminal;
-        terminal.push(this.terminalRow(this.terminal_rows));
-        this.setState({ terminal });
-        this.terminal_rows += 2;
-    }
-
-    terminalRow = (id) => {
-        return (
-            <React.Fragment key={id}>
-                <div className="flex w-full h-5">
-                    <div className="flex">
-                        <div className=" text-ubt-green">nishant@Dell</div>
-                        <div className="text-white mx-px font-medium">:</div>
-                        <div className=" text-ubt-blue">{this.current_directory}</div>
-                        <div className="text-white mx-px font-medium mr-1">$</div>
-                    </div>
-                    <div id="cmd" onClick={this.focusCursor} className=" bg-transperent relative flex-1 overflow-hidden">
-                        <span id={`show-${id}`} className=" float-left whitespace-pre pb-1 opacity-100 font-normal tracking-wider"></span>
-                        <div id={`cursor-${id}`} className=" float-left mt-1 w-1.5 h-3.5 bg-white"></div>
-                        <input id={`terminal-input-${id}`} data-row-id={id} onKeyDown={this.checkKey} onBlur={this.unFocusCursor} className=" absolute top-0 left-0 w-full opacity-0 outline-none bg-transparent" spellCheck={false} autoFocus={true} autoComplete="off" type="text" />
-                    </div>
-                </div>
-                <div id={`row-result-${id}`} className={"my-2 font-normal"}></div>
-            </React.Fragment>
-        );
-
-    }
-
-    focusCursor = (e) => {
-        clearInterval(this.cursor);
-        this.startCursor($(e.target).data("row-id"));
-    }
-
-    unFocusCursor = (e) => {
-        this.stopCursor($(e.target).data("row-id"));
-    }
-
-    startCursor = (id) => {
-        clearInterval(this.cursor);
-        $(`input#terminal-input-${id}`).trigger("focus");
-        // On input change, set current text in span
-        $(`input#terminal-input-${id}`).on("input", function () {
-            $(`#cmd span#show-${id}`).text($(this).val());
-        });
-        this.cursor = window.setInterval(function () {
-            if ($(`#cursor-${id}`).css('visibility') === 'visible') {
-                $(`#cursor-${id}`).css({ visibility: 'hidden' });
-            } else {
-                $(`#cursor-${id}`).css({ visibility: 'visible' });
+    // File system structure
+    const fileSystem = useMemo(() => ({
+        root: {
+            type: 'directory',
+            children: {
+                education: {
+                    type: 'directory',
+                    children: {
+                        'BTech_Biomedical_Engineering_IITH.txt': { type: 'file', content: 'B.Tech in Biomedical Engineering from IIT Hyderabad' },
+                        'Double_Major_Entrepreneurship_IITH.txt': { type: 'file', content: 'Double Major in Entrepreneurship from IIT Hyderabad' },
+                        'Minor_Economics_IITH.txt': { type: 'file', content: 'Minor in Economics from IIT Hyderabad' },
+                        'Class_XII_CBSE.txt': { type: 'file', content: 'Class XII CBSE Board Examination' },
+                        'Class_X_CBSE.txt': { type: 'file', content: 'Class X CBSE Board Examination' }
+                    }
+                },
+                projects: {
+                    type: 'directory',
+                    children: {
+                        'Hybrid_CNN_LSTM_Emotion_Recognition.txt': { type: 'file', content: 'AI project for emotion recognition using hybrid CNN-LSTM architecture' },
+                        'Data_Structures_Comparison.txt': { type: 'file', content: 'Comparative analysis of various data structures and their performance' },
+                        'Route_Optimization_Tool.txt': { type: 'file', content: 'Tool for optimizing routes using graph algorithms' },
+                        'CPU_Scheduling_Algorithms.txt': { type: 'file', content: 'Implementation and comparison of CPU scheduling algorithms' }
+                    }
+                },
+                experience: {
+                    type: 'directory',
+                    children: {
+                        'Goldman_Sachs_Summer_Analyst_2025.txt': { type: 'file', content: 'Summer Analyst position at Goldman Sachs (2025)' },
+                        'Pentakod_Python_Developer_Intern_2024.txt': { type: 'file', content: 'Python Developer Intern at Pentakod (2024)' }
+                    }
+                },
+                skills: {
+                    type: 'directory',
+                    children: {
+                        'Programming_Languages.txt': { type: 'file', content: 'C, C++, Python, Java, JavaScript, SQL' },
+                        'Development_Tools.txt': { type: 'file', content: 'Git, Docker, VS Code, IntelliJ, Jupyter' },
+                        'Python_Libraries.txt': { type: 'file', content: 'NumPy, Pandas, TensorFlow, PyTorch, Scikit-learn' },
+                        'Other_Tools.txt': { type: 'file', content: 'MATLAB, R, MongoDB, PostgreSQL' }
+                    }
+                },
+                languages: {
+                    type: 'directory',
+                    children: {
+                        'C': { type: 'file', content: 'Advanced proficiency in C programming' },
+                        'C++': { type: 'file', content: 'Expert level C++ with STL and OOP' },
+                        'Python': { type: 'file', content: 'Professional Python development experience' },
+                        'SQL': { type: 'file', content: 'Database design and query optimization' },
+                        'FORTRAN': { type: 'file', content: 'Scientific computing with FORTRAN' },
+                        'MATLAB': { type: 'file', content: 'Mathematical modeling and simulation' },
+                        'VERILOG': { type: 'file', content: 'Hardware description language for FPGA' },
+                        'HTML': { type: 'file', content: 'Web markup and semantic HTML' },
+                        'CSS': { type: 'file', content: 'Advanced styling and responsive design' }
+                    }
+                },
+                courses: {
+                    type: 'directory',
+                    children: {
+                        'Computer_Science.txt': { type: 'file', content: 'Data Structures, Algorithms, Database Systems, Computer Networks' },
+                        'Mathematics.txt': { type: 'file', content: 'Linear Algebra, Calculus, Statistics, Discrete Mathematics' },
+                        'Artificial_Intelligence.txt': { type: 'file', content: 'Machine Learning, Deep Learning, Neural Networks, Computer Vision' }
+                    }
+                },
+                extracurricular: {
+                    type: 'directory',
+                    children: {
+                        'NCC_Gold_Medal.txt': { type: 'file', content: 'National Cadet Corps Gold Medal recipient' },
+                        'Vishwakarma_Awards.txt': { type: 'file', content: 'Excellence awards in technical competitions' },
+                        'Office_of_Career_Services.txt': { type: 'file', content: 'Career services team member at IIT Hyderabad' },
+                        'Finance_and_Consulting_Club.txt': { type: 'file', content: 'Active member of Finance and Consulting Club' }
+                    }
+                },
+                contact: {
+                    type: 'directory',
+                    children: {
+                        'email.txt': { type: 'file', content: 'nishant@example.com' },
+                        'phone.txt': { type: 'file', content: '+91-XXXXXXXXXX' },
+                        'github.txt': { type: 'file', content: 'https://github.com/nishant-iith' }
+                    }
+                }
             }
+        }
+    }), []);
+
+    // Cursor blinking effect
+    useEffect(() => {
+        cursorIntervalRef.current = setInterval(() => {
+            setCursorVisible(prev => !prev);
         }, 500);
-    }
 
-    stopCursor = (id) => {
-        clearInterval(this.cursor);
-        $(`#cursor-${id}`).css({ visibility: 'visible' });
-    }
-
-    removeCursor = (id) => {
-        this.stopCursor(id);
-        $(`#cursor-${id}`).css({ display: 'none' });
-    }
-
-    clearInput = (id) => {
-        $(`input#terminal-input-${id}`).trigger("blur");
-    }
-
-    checkKey = (e) => {
-        if (e.key === "Enter") {
-            let terminal_row_id = $(e.target).data("row-id");
-            let command = $(`input#terminal-input-${terminal_row_id}`).val().trim();
-            if (command.length !== 0) {
-                this.removeCursor(terminal_row_id);
-                this.handleCommands(command, terminal_row_id);
+        return () => {
+            if (cursorIntervalRef.current) {
+                clearInterval(cursorIntervalRef.current);
             }
-            else return;
-            // push to history
-            this.prev_commands.push(command);
-            this.commands_index = this.prev_commands.length - 1;
+        };
+    }, []);
 
-            this.clearInput(terminal_row_id);
+    // Auto-focus input
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.focus();
         }
-        else if (e.key === "ArrowUp") {
-            let prev_command;
+    }, [history]);
 
-            if (this.commands_index <= -1) prev_command = "";
-            else prev_command = this.prev_commands[this.commands_index];
-
-            let terminal_row_id = $(e.target).data("row-id");
-
-            $(`input#terminal-input-${terminal_row_id}`).val(prev_command);
-            $(`#show-${terminal_row_id}`).text(prev_command);
-
-            this.commands_index--;
+    // Scroll to bottom when new content is added
+    useEffect(() => {
+        if (terminalRef.current) {
+            terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
         }
-        else if (e.key === "ArrowDown") {
-            let prev_command;
+    }, [history]);
 
-            if (this.commands_index >= this.prev_commands.length) return;
-            if (this.commands_index <= -1) this.commands_index = 0;
-
-            if (this.commands_index === this.prev_commands.length) prev_command = "";
-            else prev_command = this.prev_commands[this.commands_index];
-
-            let terminal_row_id = $(e.target).data("row-id");
-
-            $(`input#terminal-input-${terminal_row_id}`).val(prev_command);
-            $(`#show-${terminal_row_id}`).text(prev_command);
-
-            this.commands_index++;
+    // Get current directory object
+    const getCurrentDirectory = useCallback(() => {
+        const pathParts = currentPath === '~' ? ['root'] : currentPath.replace('~/', '').split('/').filter(Boolean);
+        pathParts[0] = 'root'; // Ensure we start from root
+        
+        let current = fileSystem;
+        for (const part of pathParts) {
+            current = current[part]?.children || {};
         }
-    }
+        return current;
+    }, [currentPath, fileSystem]);
 
-    childDirectories = (parent) => {
-        let files = [];
-        files.push(`<div class="flex justify-start flex-wrap">`)
-        this.child_directories[parent].forEach(file => {
-            files.push(
-                `<span class="font-bold mr-2 text-ubt-blue">'${file}'</span>`
-            )
+    // Navigate to directory
+    const navigateToDirectory = useCallback((dirName) => {
+        if (dirName === '' || dirName === '~') {
+            setCurrentPath('~');
+            setCurrentDir('root');
+            return { success: true };
+        }
+
+        if (dirName === '.' || dirName === '..' || dirName === '../') {
+            return { success: false, error: "Type 'cd' to go back 😅" };
+        }
+
+        if (dirName === 'personal-documents') {
+            return { success: false, error: `bash /${currentDir} : Permission denied 😏` };
+        }
+
+        const currentDirContents = getCurrentDirectory();
+        
+        if (currentDirContents[dirName] && currentDirContents[dirName].type === 'directory') {
+            const newPath = currentPath === '~' ? `~/${dirName}` : `${currentPath}/${dirName}`;
+            setCurrentPath(newPath);
+            setCurrentDir(dirName);
+            return { success: true };
+        }
+
+        return { success: false, error: `bash: cd: ${dirName}: No such file or directory` };
+    }, [currentPath, currentDir, getCurrentDirectory]);
+
+    // List directory contents
+    const listDirectory = useCallback((targetDir = null) => {
+        const target = targetDir || currentDir;
+        
+        if (target === 'personal-documents') {
+            return { success: false, error: 'Nope! 🙃' };
+        }
+
+        let targetContents;
+        if (target === currentDir || !targetDir) {
+            targetContents = getCurrentDirectory();
+        } else if (target === 'root' || fileSystem.root.children[target]) {
+            targetContents = fileSystem.root.children[target]?.children || fileSystem.root.children;
+        } else {
+            return { success: false, error: `ls: cannot access '${target}': No such file or directory` };
+        }
+
+        const items = Object.keys(targetContents).map(name => {
+            const item = targetContents[name];
+            const className = item.type === 'directory' ? 'text-ubt-blue font-bold' : 'text-ubt-green';
+            return `<span class="${className} mr-4 mb-1 inline-block">${name}</span>`;
         });
-        files.push(`</div>`)
-        return files;
-    }
 
-    closeTerminal = () => {
-        $("#close-terminal").trigger('click');
-    }
+        return { success: true, output: `<div class="flex flex-wrap gap-1">${items.join('')}</div>` };
+    }, [currentDir, getCurrentDirectory, fileSystem]);
 
-    handleCommands = (command, rowId) => {
-        let words = command.split(' ').filter(Boolean);
-        let main = words[0];
-        words.shift()
-        let result = "";
-        let rest = words.join(" ");
-        rest = rest.trim();
-        const availableCommands = "[ cd, ls, pwd, echo, clear, exit, mkdir, about-nishant, todoist, settings, sendmsg ]";
-        switch (main) {
-            case "cd":
-                if (words.length === 0 || rest === "") {
-                    this.current_directory = "~";
-                    this.curr_dir_name = "root"
-                    break;
-                }
-                if (words.length > 1) {
-                    result = "too many arguments, arguments must be <1.";
-                    break;
-                }
+    // Sanitize and escape text for safe display
+    const sanitizeText = useCallback((text) => {
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#x27;');
+    }, []);
 
-                if (rest === "personal-documents") {
-                    result = `bash /${this.curr_dir_name} : Permission denied 😏`;
-                    break;
+    // Advanced command parsing with support for quotes and escaping
+    const parseCommand = useCallback((input) => {
+        const parts = [];
+        let current = '';
+        let inQuotes = false;
+        let quoteChar = '';
+        
+        for (let i = 0; i < input.length; i++) {
+            const char = input[i];
+            
+            if (!inQuotes && (char === '"' || char === "'")) {
+                inQuotes = true;
+                quoteChar = char;
+            } else if (inQuotes && char === quoteChar) {
+                inQuotes = false;
+                quoteChar = '';
+            } else if (!inQuotes && char === ' ') {
+                if (current.trim()) {
+                    parts.push(current.trim());
+                    current = '';
                 }
+            } else {
+                current += char;
+            }
+        }
+        
+        if (current.trim()) {
+            parts.push(current.trim());
+        }
+        
+        return parts;
+    }, []);
 
-                if (this.child_directories[this.curr_dir_name].includes(rest)) {
-                    this.current_directory += "/" + rest;
-                    this.curr_dir_name = rest;
-                }
-                else if (rest === "." || rest === ".." || rest === "../") {
-                    result = "Type 'cd' to go back 😅";
-                    break;
-                }
-                else {
-                    result = `bash: cd: ${words}: No such file or directory`;
-                }
-                break;
-            case "ls":
-                let target = words[0];
-                if (target === "" || target === undefined || target === null) target = this.curr_dir_name;
+    // Validate command arguments
+    const validateCommand = useCallback((command, args, expectedArgs) => {
+        if (expectedArgs.min !== undefined && args.length < expectedArgs.min) {
+            return { valid: false, error: `${command}: missing operand${expectedArgs.min > 1 ? 's' : ''}` };
+        }
+        if (expectedArgs.max !== undefined && args.length > expectedArgs.max) {
+            return { valid: false, error: `${command}: too many arguments` };
+        }
+        if (expectedArgs.exact !== undefined && args.length !== expectedArgs.exact) {
+            return { valid: false, error: `${command}: expected ${expectedArgs.exact} argument${expectedArgs.exact !== 1 ? 's' : ''}, got ${args.length}` };
+        }
+        return { valid: true };
+    }, []);
 
-                if (words.length > 1) {
-                    result = "too many arguments, arguments must be <1.";
-                    break;
-                }
-                if (target in this.child_directories) {
-                    result = this.childDirectories(target).join("");
-                }
-                else if (target === "personal-documents") {
-                    result = "Nope! 🙃";
-                    break;
-                }
-                else {
-                    result = `ls: cannot access '${words}': No such file or directory                    `;
-                }
+    // Process commands with advanced parsing
+    const processCommand = useCallback((input) => {
+        const trimmedInput = input.trim();
+        if (!trimmedInput) return;
+
+        const parts = parseCommand(trimmedInput);
+        const command = parts[0].toLowerCase();
+        const args = parts.slice(1);
+
+        let output = '';
+        let isHtml = false;
+
+        switch (command) {
+            case 'help':
+                output = `Available Commands:
+Navigation:  cd, ls, pwd, clear, exit
+File ops:    cat, mkdir, echo
+Apps:        about-nishant, todoist, settings, sendmsg
+System:      help, whoami, date, uptime
+Fun:         sudo, cowsay`;
                 break;
-            case "mkdir":
-                if (words[0] !== undefined && words[0] !== "") {
-                    this.props.addFolder(words[0]);
-                    result = "";
-                } else {
-                    result = "mkdir: missing operand";
-                }
+
+            case 'whoami':
+                output = 'nishant';
                 break;
-            case "pwd":
-                let str = this.current_directory;
-                result = str.replace("~", "/home/nishant")
+
+            case 'date':
+                output = new Date().toString();
                 break;
-            case "echo":
-                result = this.xss(words.join(" "));
+
+            case 'uptime':
+                const uptime = Math.floor((Date.now() - performance.timeOrigin) / 1000);
+                const hours = Math.floor(uptime / 3600);
+                const minutes = Math.floor((uptime % 3600) / 60);
+                const seconds = uptime % 60;
+                output = `up ${hours}h ${minutes}m ${seconds}s`;
                 break;
-            case "todoist":
-                if (words[0] === "." || words.length === 0) {
-                    this.props.openApp("todo-ist");
-                } else {
-                    result = "Command '" + main + "' not found, or not yet implemented.<br>Available Commands: [ cd, ls, pwd, echo, clear, exit, mkdir, about-nishant, todoist, settings, sendmsg ]";
-                }
+
+            case 'cowsay':
+                const message = args.join(' ') || 'Hello from Ubuntu Terminal!';
+                output = `
+ ${'_'.repeat(message.length + 2)}
+< ${message} >
+ ${'-'.repeat(message.length + 2)}
+        \\   ^__^
+         \\  (oo)\\_______
+            (__)\\       )\\/\\
+                ||----w |
+                ||     ||
+                `;
                 break;
-            case "trash":
-                if (words[0] === "." || words.length === 0) {
-                    this.props.openApp("trash");
-                } else {
-                    result = "Command '" + main + "' not found, or not yet implemented.<br>Available Commands: [ cd, ls, pwd, echo, clear, exit, mkdir, about-nishant, todoist, settings, sendmsg ]";
-                }
-                break;
-            case "about-nishant":
-                if (words[0] === "." || words.length === 0) {
-                    this.props.openApp("about-nishant");
-                } else {
-                    result = "Command '" + main + "' not found, or not yet implemented.<br>Available Commands: [ cd, ls, pwd, echo, clear, exit, mkdir, about-nishant, todoist, settings, sendmsg ]";
-                }
-                break;
-            case "terminal":
-                if (words[0] === "." || words.length === 0) {
-                    this.props.openApp("terminal");
-                } else {
-                    result = "Command '" + main + "' not found, or not yet implemented.<br>Available Commands: [ cd, ls, pwd, echo, clear, exit, mkdir, about-nishant, todoist, settings, sendmsg ]";
-                }
-                break;
-            case "settings":
-                if (words[0] === "." || words.length === 0) {
-                    this.props.openApp("settings");
-                } else {
-                    result = "Command '" + main + "' not found, or not yet implemented.<br>Available Commands: [ cd, ls, pwd, echo, clear, exit, mkdir, about-nishant, todoist, settings, sendmsg ]";
-                }
-                break;
-            case "sendmsg":
-                if (words[0] === "." || words.length === 0) {
-                    this.props.openApp("gedit");
-                } else {
-                    result = "Command '" + main + "' not found, or not yet implemented.<br>Available Commands: [ cd, ls, pwd, echo, clear, exit, mkdir, about-nishant, todoist, settings, sendmsg ]";
-                }
-                break;
-            case "clear":
-                this.reStartTerminal();
+
+            case 'clear':
+                setHistory([]);
                 return;
-            case "exit":
-                this.closeTerminal();
+
+            case 'exit':
+                if (openApp) {
+                    // Close terminal
+                    document.getElementById('close-terminal')?.click();
+                }
                 return;
-            case "sudo":
+
+            case 'pwd':
+                output = currentPath.replace('~', '/home/nishant');
+                break;
+
+            case 'cd':
+                const result = navigateToDirectory(args[0] || '');
+                if (!result.success) {
+                    output = result.error;
+                }
+                break;
+
+            case 'ls':
+                const lsValidation = validateCommand('ls', args, { max: 1 });
+                if (!lsValidation.valid) {
+                    output = lsValidation.error;
+                } else {
+                    const lsResult = listDirectory(args[0]);
+                    if (lsResult.success) {
+                        output = lsResult.output;
+                        isHtml = true;
+                    } else {
+                        output = lsResult.error;
+                    }
+                }
+                break;
+
+            case 'cat':
+                const catValidation = validateCommand('cat', args, { min: 1, max: 1 });
+                if (!catValidation.valid) {
+                    output = catValidation.error;
+                } else {
+                    const filename = args[0];
+                    const currentDirContents = getCurrentDirectory();
+                    if (currentDirContents[filename] && currentDirContents[filename].type === 'file') {
+                        output = currentDirContents[filename].content;
+                    } else {
+                        output = `cat: ${filename}: No such file or directory`;
+                    }
+                }
+                break;
+
+            case 'echo':
+                output = sanitizeText(args.join(' '));
+                break;
+
+            case 'mkdir':
+                if (args.length === 0) {
+                    output = 'mkdir: missing operand';
+                } else if (args.length > 1) {
+                    output = 'mkdir: too many arguments';
+                } else {
+                    if (addFolder) {
+                        addFolder(args[0]);
+                        output = '';
+                    } else {
+                        output = 'mkdir: operation not supported';
+                    }
+                }
+                break;
+
+            case 'sudo':
+                // Google Analytics
                 const TRACKING_ID = process.env.NEXT_PUBLIC_TRACKING_ID;
                 if (TRACKING_ID) {
                     ReactGA.event({
@@ -304,69 +382,257 @@ export class Terminal extends Component {
                         action: "lol",
                     });
                 }
-
-                result = "<img class=' w-2/5' src='./images/memes/used-sudo-command.webp' />";
+                output = `<img class="w-2/5 max-w-md my-2" src="./images/memes/used-sudo-command.webp" alt="Sudo meme" />`;
+                isHtml = true;
                 break;
-            case "help":
-                result = "Available Commands: [ cd, ls, pwd, echo, clear, exit, mkdir, about-nishant, todoist, settings, sendmsg ]";
-                break;
-            default:
-                result = `Command '${main}' not found, or not yet implemented.<br>Available Commands: ${availableCommands}`;
-        }
-        const resultElement = document.getElementById(`row-result-${rowId}`);
-        if (resultElement) {
-            // Only allow HTML for specific safe commands, otherwise use textContent
-            const htmlAllowedCommands = ['sudo', 'ls', 'help'];
-            if (htmlAllowedCommands.includes(main) || result.includes('<img') || result.includes('<br>')) {
-                resultElement.innerHTML = result;
-            } else {
-                resultElement.textContent = result;
-            }
-        }
-        this.appendTerminalRow();
-    }
 
-    xss(str) {
-        if (!str) return '';
-        return str.split('').map(char => {
-            switch (char) {
-                case '&':
-                    return '&amp;';
-                case '<':
-                    return '&lt;';
-                case '>':
-                    return '&gt;';
-                case '"':
-                    return '&quot;';
-                case "'":
-                    return '&#x27;';
-                case '/':
-                    return '&#x2F;';
-                default:
-                    return char;
-            }
-        }).join('');
-    }
-
-    render() {
-        return (
-            <div className="h-full w-full bg-ub-drk-abrgn text-white text-sm font-bold" id="terminal-body">
-                {
-                    this.state.terminal
+            case 'about-nishant':
+                if (openApp) {
+                    openApp('about-nishant');
+                    output = 'Opening About Nishant...';
+                } else {
+                    output = 'about-nishant: command not available';
                 }
-            </div>
-        )
-    }
-}
+                break;
 
-// PropTypes validation
+            case 'todoist':
+                if (openApp) {
+                    openApp('todo-ist');
+                    output = 'Opening Todoist...';
+                } else {
+                    output = 'todoist: command not available';
+                }
+                break;
+
+            case 'settings':
+                if (openApp) {
+                    openApp('settings');
+                    output = 'Opening Settings...';
+                } else {
+                    output = 'settings: command not available';
+                }
+                break;
+
+            case 'sendmsg':
+                if (openApp) {
+                    openApp('gedit');
+                    output = 'Opening Contact Form...';
+                } else {
+                    output = 'sendmsg: command not available';
+                }
+                break;
+
+            default:
+                output = `Command '${command}' not found. Type 'help' for available commands.`;
+                break;
+        }
+
+        // Add to history
+        setHistory(prev => [...prev, {
+            id: Date.now(),
+            input: trimmedInput,
+            output: output,
+            isHtml: isHtml,
+            path: currentPath,
+            dir: currentDir
+        }]);
+
+    }, [currentPath, currentDir, getCurrentDirectory, navigateToDirectory, listDirectory, sanitizeText, addFolder, openApp]);
+
+    // Handle input submission
+    const handleSubmit = useCallback((e) => {
+        e.preventDefault();
+        
+        if (!currentInput.trim()) return;
+
+        // Add to command history
+        setCommandHistory(prev => [...prev, currentInput]);
+        setHistoryIndex(-1);
+
+        // Process the command
+        processCommand(currentInput);
+
+        // Clear input
+        setCurrentInput('');
+    }, [currentInput, processCommand]);
+
+    // Handle input changes
+    const handleInputChange = useCallback((e) => {
+        setCurrentInput(e.target.value);
+        setHistoryIndex(-1);
+    }, []);
+
+    // Get command suggestions
+    const getCommandSuggestions = useCallback((partial) => {
+        const commands = [
+            'help', 'whoami', 'date', 'uptime', 'clear', 'exit', 'pwd', 'cd', 'ls', 'cat',
+            'echo', 'mkdir', 'sudo', 'cowsay', 'about-nishant', 'todoist', 'settings', 'sendmsg'
+        ];
+        return commands.filter(cmd => cmd.startsWith(partial.toLowerCase()));
+    }, []);
+
+    // Get file/directory suggestions for current directory
+    const getPathSuggestions = useCallback((partial) => {
+        const currentDirContents = getCurrentDirectory();
+        return Object.keys(currentDirContents).filter(name => 
+            name.toLowerCase().startsWith(partial.toLowerCase())
+        );
+    }, [getCurrentDirectory]);
+
+    // Handle tab completion
+    const handleTabCompletion = useCallback(() => {
+        const words = currentInput.split(' ');
+        const lastWord = words[words.length - 1] || '';
+        
+        let suggestions = [];
+        
+        if (words.length === 1) {
+            // Command completion
+            suggestions = getCommandSuggestions(lastWord);
+        } else if (words[0] === 'cd' || words[0] === 'ls' || words[0] === 'cat') {
+            // Path completion for navigation commands
+            suggestions = getPathSuggestions(lastWord);
+        }
+        
+        if (suggestions.length === 1) {
+            // Auto-complete if only one match
+            const newWords = [...words.slice(0, -1), suggestions[0]];
+            setCurrentInput(newWords.join(' ') + (words.length === 1 ? ' ' : ''));
+        } else if (suggestions.length > 1) {
+            // Show suggestions
+            const suggestionText = suggestions.join('  ');
+            setHistory(prev => [...prev, {
+                id: Date.now(),
+                input: currentInput,
+                output: suggestionText,
+                isHtml: false,
+                path: currentPath,
+                dir: currentDir,
+                isTabCompletion: true
+            }]);
+        }
+    }, [currentInput, getCommandSuggestions, getPathSuggestions, currentPath, currentDir]);
+
+    // Handle key navigation and special keys
+    const handleKeyDown = useCallback((e) => {
+        if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (commandHistory.length > 0) {
+                const newIndex = historyIndex === -1 ? commandHistory.length - 1 : Math.max(0, historyIndex - 1);
+                setHistoryIndex(newIndex);
+                setCurrentInput(commandHistory[newIndex]);
+            }
+        } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (historyIndex !== -1) {
+                const newIndex = historyIndex + 1;
+                if (newIndex >= commandHistory.length) {
+                    setHistoryIndex(-1);
+                    setCurrentInput('');
+                } else {
+                    setHistoryIndex(newIndex);
+                    setCurrentInput(commandHistory[newIndex]);
+                }
+            }
+        } else if (e.key === 'Tab') {
+            e.preventDefault();
+            handleTabCompletion();
+        } else if (e.key === 'l' && e.ctrlKey) {
+            // Ctrl+L to clear screen
+            e.preventDefault();
+            setHistory([]);
+        } else if (e.key === 'c' && e.ctrlKey) {
+            // Ctrl+C to cancel current input
+            e.preventDefault();
+            setCurrentInput('');
+            setHistoryIndex(-1);
+        }
+    }, [commandHistory, historyIndex, handleTabCompletion]);
+
+    // Handle clicks to focus input
+    const handleTerminalClick = useCallback(() => {
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, []);
+
+    return (
+        <div 
+            ref={terminalRef}
+            className="h-full w-full bg-ub-drk-abrgn text-ubt-grey font-ubuntu-mono text-sm p-4 overflow-y-auto cursor-text ubuntu-terminal"
+            onClick={handleTerminalClick}
+        >
+            {/* Welcome message */}
+            {history.length === 0 && (
+                <div className="mb-4 text-ubt-warm-grey">
+                    <div className="text-ubt-grey">Welcome to Nishant's Portfolio Terminal!</div>
+                    <div className="text-ubt-green">Type 'help' to see available commands.</div>
+                    <div className="mt-2 text-ubt-warm-grey text-xs">Tip: Use arrow keys to navigate command history</div>
+                </div>
+            )}
+
+            {/* Command history */}
+            {history.map((entry) => (
+                <div key={entry.id} className="mb-2">
+                    {/* Command line */}
+                    <div className="flex items-center">
+                        <span className="text-ubt-green font-medium">nishant@Dell</span>
+                        <span className="text-ubt-grey mx-1">:</span>
+                        <span className="text-ubt-blue font-medium">{entry.path}</span>
+                        <span className="text-ubt-grey mr-2">$</span>
+                        <span className="text-ubt-grey">{entry.input}</span>
+                    </div>
+                    
+                    {/* Command output */}
+                    {entry.output && (
+                        <div className="mt-1 ml-4 text-ubt-grey">
+                            {entry.isHtml ? (
+                                <div dangerouslySetInnerHTML={{ __html: entry.output }} />
+                            ) : (
+                                <pre className="whitespace-pre-wrap font-ubuntu-mono text-sm">{entry.output}</pre>
+                            )}
+                        </div>
+                    )}
+                </div>
+            ))}
+
+            {/* Current input line */}
+            <form onSubmit={handleSubmit} className="flex items-center">
+                <span className="text-ubt-green font-medium">nishant@Dell</span>
+                <span className="text-ubt-grey mx-1">:</span>
+                <span className="text-ubt-blue font-medium">{currentPath}</span>
+                <span className="text-ubt-grey mr-2">$</span>
+                <div className="flex-1 relative">
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        value={currentInput}
+                        onChange={handleInputChange}
+                        onKeyDown={handleKeyDown}
+                        className="bg-transparent outline-none text-ubt-grey w-full caret-transparent font-ubuntu-mono"
+                        autoComplete="off"
+                        spellCheck="false"
+                    />
+                    <span className="text-ubt-grey absolute left-0 top-0 pointer-events-none">{currentInput}</span>
+                    <span 
+                        className={`absolute top-0 w-2 h-4 bg-ubt-grey ml-0.5 ${cursorVisible ? 'opacity-100' : 'opacity-0'} transition-opacity duration-100`}
+                        style={{ left: `${currentInput.length * 0.6}em` }}
+                    >
+                        &nbsp;
+                    </span>
+                </div>
+            </form>
+        </div>
+    );
+};
+
 Terminal.propTypes = {
     addFolder: PropTypes.func,
     openApp: PropTypes.func
 };
 
-export default Terminal
+export default Terminal;
 
 export const displayTerminal = (addFolder, openApp) => {
     return <Terminal addFolder={addFolder} openApp={openApp} />;
-}
+};
