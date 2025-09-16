@@ -92,14 +92,8 @@ export class Window extends Component {
     }
 
     checkOverlap = () => {
-        var r = document.querySelector("#" + this.id);
-        var rect = r.getBoundingClientRect();
-        if (rect.x.toFixed(1) < 50) { // if this window overlapps with SideBar
-            this.props.hideSideBar(this.id, true);
-        }
-        else {
-            this.props.hideSideBar(this.id, false);
-        }
+        // Bottom dock doesn't need to be hidden like the old sidebar
+        // This function can remain for other positioning logic if needed
     }
 
     focusWindow = () => {
@@ -147,14 +141,14 @@ export class Window extends Component {
             // translate window to maximize position
             r.style.transform = `translate(-1pt,-2pt)`;
             this.setState({ maximized: true, height: 96.3, width: 100.2 });
-            this.props.hideSideBar(this.id, true);
+            // Bottom dock doesn't need to be hidden when maximizing
         }
     }
 
     closeWindow = () => {
         this.setWinowsPosition();
         this.setState({ closed: true }, () => {
-            this.props.hideSideBar(this.id, false);
+            // Bottom dock doesn't need to be shown when closing window
             setTimeout(() => {
                 this.props.closed(this.id)
             }, 300) // after 300ms this window will be unmounted from parent (Desktop)
@@ -203,7 +197,6 @@ Window.propTypes = {
     focus: PropTypes.func,
     hasMinimised: PropTypes.func,
     closed: PropTypes.func,
-    hideSideBar: PropTypes.func,
     changeBackgroundImage: PropTypes.func,
     bg_image_name: PropTypes.string,
     addFolder: PropTypes.func,

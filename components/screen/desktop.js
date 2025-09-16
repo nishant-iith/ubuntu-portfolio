@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import BackgroundImage from '../util components/background-image';
-import SideBar from './side_bar';
+import BottomDock from './bottom_dock';
 import apps from '../../apps.config';
 import Window from '../base/window';
 import UbuntuApp from '../base/ubuntu_app';
@@ -23,7 +23,7 @@ export class Desktop extends Component {
             overlapped_windows: {},
             disabled_apps: {},
             favourite_apps: {},
-            hideSideBar: false,
+            hideDock: false,
             minimized_windows: {},
             desktop_apps: [],
             context_menus: {
@@ -267,7 +267,6 @@ export class Desktop extends Component {
                     openApp: this.openApp,
                     focus: this.focus,
                     isFocused: this.state.focused_windows[app.id],
-                    hideSideBar: this.hideSideBar,
                     hasMinimised: this.hasMinimised,
                     minimized: this.state.minimized_windows[app.id],
                     changeBackgroundImage: this.props.changeBackgroundImage,
@@ -282,34 +281,6 @@ export class Desktop extends Component {
         return windowsJsx;
     }
 
-    hideSideBar = (objId, hide) => {
-        if (hide === this.state.hideSideBar) return;
-
-        if (objId === null) {
-            if (hide === false) {
-                this.setState({ hideSideBar: false });
-            }
-            else {
-                for (const key in this.state.overlapped_windows) {
-                    if (this.state.overlapped_windows[key]) {
-                        this.setState({ hideSideBar: true });
-                        return;
-                    }  // if any window is overlapped then hide the SideBar
-                }
-            }
-            return;
-        }
-
-        if (hide === false) {
-            for (const key in this.state.overlapped_windows) {
-                if (this.state.overlapped_windows[key] && key !== objId) return; // if any window is overlapped then don't show the SideBar
-            }
-        }
-
-        let overlapped_windows = this.state.overlapped_windows;
-        overlapped_windows[objId] = hide;
-        this.setState({ hideSideBar: hide, overlapped_windows });
-    }
 
     hasMinimised = (objId) => {
         let minimized_windows = this.state.minimized_windows;
@@ -320,7 +291,6 @@ export class Desktop extends Component {
         focused_windows[objId] = false;
         this.setState({ minimized_windows, focused_windows });
 
-        this.hideSideBar(null, false);
 
         this.giveFocusToLastApp();
     }
@@ -418,7 +388,6 @@ export class Desktop extends Component {
 
         this.giveFocusToLastApp();
 
-        this.hideSideBar(null, false);
 
         // close window
         let closed_windows = this.state.closed_windows;
@@ -508,16 +477,15 @@ export class Desktop extends Component {
                 <BackgroundImage img={this.props.bg_image_name} />
 
                 {/* Ubuntu Side Menu Bar */}
-                <SideBar apps={apps}
-                    hide={this.state.hideSideBar}
-                    hideSideBar={this.hideSideBar}
+                <BottomDock
+                    apps={apps}
                     favourite_apps={this.state.favourite_apps}
                     showAllApps={this.showAllApps}
-                    allAppsView={this.state.allAppsView}
                     closed_windows={this.state.closed_windows}
                     focused_windows={this.state.focused_windows}
                     isMinimized={this.state.minimized_windows}
-                    openAppByAppId={this.openApp} />
+                    openAppByAppId={this.openApp}
+                />
 
                 {/* Desktop Apps */}
                 {this.renderDesktopApps()}
