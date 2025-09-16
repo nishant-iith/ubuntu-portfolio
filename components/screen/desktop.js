@@ -25,6 +25,7 @@ export class Desktop extends Component {
             favourite_apps: {},
             hideDock: false,
             minimized_windows: {},
+            maximized_windows: {},
             desktop_apps: [],
             context_menus: {
                 desktop: false,
@@ -152,7 +153,7 @@ export class Desktop extends Component {
     }
 
     fetchAppsData = () => {
-        let focused_windows = {}, closed_windows = {}, disabled_apps = {}, favourite_apps = {}, overlapped_windows = {}, minimized_windows = {};
+        let focused_windows = {}, closed_windows = {}, disabled_apps = {}, favourite_apps = {}, overlapped_windows = {}, minimized_windows = {}, maximized_windows = {};
         let desktop_apps = [];
         apps.forEach((app) => {
             focused_windows = {
@@ -178,7 +179,11 @@ export class Desktop extends Component {
             minimized_windows = {
                 ...minimized_windows,
                 [app.id]: false,
-            }
+            };
+            maximized_windows = {
+                ...maximized_windows,
+                [app.id]: false,
+            };
             if (app.desktop_shortcut) desktop_apps.push(app.id);
         });
         this.setState({
@@ -188,13 +193,14 @@ export class Desktop extends Component {
             favourite_apps,
             overlapped_windows,
             minimized_windows,
+            maximized_windows,
             desktop_apps
         });
         this.initFavourite = { ...favourite_apps };
     }
 
     updateAppsData = () => {
-        let focused_windows = {}, closed_windows = {}, favourite_apps = {}, minimized_windows = {}, disabled_apps = {};
+        let focused_windows = {}, closed_windows = {}, favourite_apps = {}, minimized_windows = {}, disabled_apps = {}, maximized_windows = {};
         let desktop_apps = [];
         apps.forEach((app) => {
             focused_windows = {
@@ -204,6 +210,10 @@ export class Desktop extends Component {
             minimized_windows = {
                 ...minimized_windows,
                 [app.id]: ((this.state.minimized_windows[app.id] !== undefined || this.state.minimized_windows[app.id] !== null) ? this.state.minimized_windows[app.id] : false)
+            };
+            maximized_windows = {
+                ...maximized_windows,
+                [app.id]: ((this.state.maximized_windows[app.id] !== undefined || this.state.maximized_windows[app.id] !== null) ? this.state.maximized_windows[app.id] : false)
             };
             disabled_apps = {
                 ...disabled_apps,
@@ -224,6 +234,7 @@ export class Desktop extends Component {
             closed_windows,
             disabled_apps,
             minimized_windows,
+            maximized_windows,
             favourite_apps,
             desktop_apps
         });
@@ -269,6 +280,8 @@ export class Desktop extends Component {
                     isFocused: this.state.focused_windows[app.id],
                     hasMinimised: this.hasMinimised,
                     minimized: this.state.minimized_windows[app.id],
+                    hasMaximized: this.hasMaximized,
+                    hasRestored: this.hasRestored,
                     changeBackgroundImage: this.props.changeBackgroundImage,
                     bg_image_name: this.props.bg_image_name,
                 }
@@ -400,7 +413,7 @@ export class Desktop extends Component {
     }
 
     focus = (objId) => {
-        // removes focus from all window and 
+        // removes focus from all window and
         // gives focus to window with 'id = objId'
         var focused_windows = this.state.focused_windows;
         focused_windows[objId] = true;
@@ -412,6 +425,24 @@ export class Desktop extends Component {
             }
         }
         this.setState({ focused_windows });
+    }
+
+    hasMaximized = (objId) => {
+        let maximized_windows = this.state.maximized_windows;
+        maximized_windows[objId] = true;
+        this.setState({ maximized_windows }, this.checkDockVisibility);
+    }
+
+    hasRestored = (objId) => {
+        let maximized_windows = this.state.maximized_windows;
+        maximized_windows[objId] = false;
+        this.setState({ maximized_windows }, this.checkDockVisibility);
+    }
+
+    checkDockVisibility = () => {
+        // Hide dock if any window is maximized
+        const hasMaximizedWindow = Object.values(this.state.maximized_windows).some(isMaximized => isMaximized);
+        this.setState({ hideDock: hasMaximizedWindow });
     }
 
     addNewFolder = () => {
@@ -476,7 +507,7 @@ export class Desktop extends Component {
                 {/* Background Image */}
                 <BackgroundImage img={this.props.bg_image_name} />
 
-                {/* Ubuntu Side Menu Bar */}
+                {/* Ubuntu Bottom Dock */}
                 <BottomDock
                     apps={apps}
                     favourite_apps={this.state.favourite_apps}
@@ -485,6 +516,7 @@ export class Desktop extends Component {
                     focused_windows={this.state.focused_windows}
                     isMinimized={this.state.minimized_windows}
                     openAppByAppId={this.openApp}
+                    hideDock={this.state.hideDock}
                 />
 
                 {/* Desktop Apps */}

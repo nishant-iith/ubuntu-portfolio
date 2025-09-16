@@ -41,8 +41,13 @@ export class Window extends Component {
         window.removeEventListener('resize', this.resizeBoundries);
     }
 
-    // Typo fix
     setDefaultWindowDimension = () => {
+        // Special sizing for calculator app
+        if (this.id === 'calc') {
+            this.setState({ height: 70, width: 25 }, this.resizeBoundries);
+            return;
+        }
+
         if (window.innerWidth < 640) {
             this.setState({ height: 60, width: 85 }, this.resizeBoundries);
         }
@@ -127,6 +132,10 @@ export class Window extends Component {
         setTimeout(() => {
             this.setState({ maximized: false });
             this.checkOverlap();
+            // Notify parent that window is restored (to show dock)
+            if (this.props.hasRestored) {
+                this.props.hasRestored(this.id);
+            }
         }, 300);
     }
 
@@ -141,7 +150,10 @@ export class Window extends Component {
             // translate window to maximize position
             r.style.transform = `translate(-1pt,-2pt)`;
             this.setState({ maximized: true, height: 96.3, width: 100.2 });
-            // Bottom dock doesn't need to be hidden when maximizing
+            // Notify parent that window is maximized (to hide dock)
+            if (this.props.hasMaximized) {
+                this.props.hasMaximized(this.id);
+            }
         }
     }
 
@@ -196,6 +208,8 @@ Window.propTypes = {
     isFocused: PropTypes.bool,
     focus: PropTypes.func,
     hasMinimised: PropTypes.func,
+    hasMaximized: PropTypes.func,
+    hasRestored: PropTypes.func,
     closed: PropTypes.func,
     changeBackgroundImage: PropTypes.func,
     bg_image_name: PropTypes.string,

@@ -35,8 +35,8 @@ let renderApps = (props) => {
  */
 export default function BottomDock(props) {
     return (
-        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 z-40 mb-2">
-            <div className="flex items-center justify-center px-3 py-2 bg-ub-panel bg-opacity-90 backdrop-blur-md rounded-2xl shadow-ubuntu-lg border border-gray-600 border-opacity-30">
+        <div className={`fixed bottom-0 left-1/2 transform -translate-x-1/2 z-40 mb-2 transition-all duration-300 ${props.hideDock ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}>
+            <div className="flex items-center justify-center px-3 py-2 bg-ub-panel bg-opacity-60 backdrop-blur-sm rounded-2xl shadow-ubuntu-lg border border-gray-600 border-opacity-20">
                 {/* App Grid (Show Applications) - Always leftmost */}
                 <ShowApplications showApps={props.showAllApps} />
 
