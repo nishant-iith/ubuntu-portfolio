@@ -14,7 +14,7 @@ export default class Clock extends Component {
     componentDidMount() {
         this.update_time = setInterval(() => {
             this.setState({ current_time: new Date() });
-        }, 10 * 1000);
+        }, 1000);
     }
 
     componentWillUnmount() {
@@ -36,6 +36,7 @@ export default class Clock extends Component {
         }
 
         if (this.state.hour_12 && hour > 12) hour -= 12;
+        if (this.state.hour_12 && hour === 0) hour = 12;
 
         let display_time;
         if (this.props.onlyTime) {
@@ -44,7 +45,11 @@ export default class Clock extends Component {
         else if (this.props.onlyDay) {
             display_time = day + " " + month + " " + date;
         }
-        else display_time = day + " " + month + " " + date + " " + hour + ":" + minute + " " + meridiem;
-        return <span>{display_time}</span>;
+        else {
+            // Improved spacing for Ubuntu-style display
+            display_time = day + ", " + month + " " + date + " " + hour + ":" + minute + " " + meridiem;
+        }
+
+        return <span className="text-xs">{display_time}</span>;
     }
 }
