@@ -38,6 +38,14 @@ jobs:
           cp -r ../docs-temp/. .
           rm -rf ../docs-temp
           touch .nojekyll
-          git add . || true
+          # Create a .gitignore for gh-pages branch to exclude problematic files
+          echo "node_modules/" > .gitignore
+          echo ".next/" >> .gitignore
+          echo "*.log" >> .gitignore
+          # Only add the built static files, not node_modules or other build artifacts
+          git add .nojekyll .gitignore || true
+          git add --all --force . || true
+          # Remove any accidentally added node_modules
+          git rm -rf node_modules/ 2>/dev/null || true
           git commit -m "Deploy to GitHub Pages [skip ci]" || echo "No changes to commit"
           git push --force https://x-access-token:${PAT_TOKEN}@github.com/nishant-iith/ubuntu-portfolio.git gh-pages
