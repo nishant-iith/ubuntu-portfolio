@@ -44,7 +44,7 @@ export class Window extends Component {
     setDefaultWindowDimension = () => {
         // Special sizing for calculator app
         if (this.id === 'calc') {
-            this.setState({ height: 70, width: 25 }, this.resizeBoundries);
+            this.setState({ height: 50, width: 25 }, this.resizeBoundries);
             return;
         }
 

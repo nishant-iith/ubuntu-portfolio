@@ -7,11 +7,18 @@ export default class Clock extends Component {
         this.day_list = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         this.state = {
             hour_12: true,
-            current_time: new Date()
+            current_time: null,  // Start with null to avoid hydration mismatch
+            isClient: false
         };
     }
 
     componentDidMount() {
+        // Set initial time and client flag after mounting
+        this.setState({
+            current_time: new Date(),
+            isClient: true
+        });
+
         this.update_time = setInterval(() => {
             this.setState({ current_time: new Date() });
         }, 1000);
@@ -22,7 +29,12 @@ export default class Clock extends Component {
     }
 
     render() {
-        const { current_time } = this.state;
+        const { current_time, isClient } = this.state;
+
+        // Show placeholder during SSR and initial client render to prevent hydration mismatch
+        if (!isClient || !current_time) {
+            return <span className="text-xs">Loading...</span>;
+        }
 
         let day = this.day_list[current_time.getDay()];
         let hour = current_time.getHours();

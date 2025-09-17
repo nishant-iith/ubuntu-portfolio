@@ -431,8 +431,8 @@ export class Calc extends Component {
                 </div>
 
                 {/* Button Grid */}
-                <div className="flex-1 p-3">
-                    <div className="grid grid-cols-4 gap-1 h-full">
+                <div className="flex-1 p-1">
+                    <div className="grid grid-cols-4 grid-rows-5 gap-x-1 gap-y-1">
                         {/* Row 1 */}
                         {this.renderButton('C', this.clear, 'bg-gray-600 hover:bg-gray-500 text-white')}
                         {this.renderButton('⌫', this.backspace, 'bg-gray-600 hover:bg-gray-500 text-white')}
