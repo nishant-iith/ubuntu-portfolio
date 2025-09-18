@@ -1,5 +1,3 @@
-# This is a placeholder README file for your project.
-
 # Project Title
 
 A brief description of your project.
@@ -55,17 +53,3 @@ npm run deploy
 * [Next.js](https://nextjs.org/) - The React Framework
 * [Node.js](https://nodejs.org/) - JavaScript runtime built on Chrome's V8 JavaScript engine
 * [npm](https://www.npmjs.com/) - Package manager for JavaScript
-
-## Contributing
-
-Please read [CONTRIBUTING.md](file:///d%3A/IITH/Projects/Portfolio/ubuntu-portfolio/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](file:///d%3A/IITH/Projects/Portfolio/ubuntu-portfolio/LICENSE.md) file for details.
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
