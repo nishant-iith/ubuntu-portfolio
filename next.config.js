@@ -2,19 +2,20 @@
 const repo = 'ubuntu-portfolio';
 
 const isProd = process.env.NODE_ENV === 'production';
+const isGitHubPages = process.env.GITHUB_PAGES === 'true';
 
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  
+
   // Performance optimizations
   compress: true,
   poweredByHeader: false,
-  trailingSlash: true, // Better for GitHub Pages
+  trailingSlash: true,
 
-  // Image optimization for static export
+  // Image optimization
   images: {
-    unoptimized: true, // Required for static export
+    unoptimized: true,
     domains: [],
     formats: ['image/webp', 'image/avif'],
   },
@@ -24,8 +25,8 @@ const nextConfig = {
     CUSTOM_KEY: process.env.CUSTOM_KEY || '',
   },
 
-  // GitHub Pages compatible settings
-  ...(isProd && {
+  // GitHub Pages specific settings only when deploying to GitHub Pages
+  ...(isProd && isGitHubPages && {
     output: 'export',
     distDir: 'docs',
     basePath: '/' + repo,
