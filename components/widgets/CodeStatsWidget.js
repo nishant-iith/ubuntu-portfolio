@@ -147,16 +147,34 @@ export class CodeStatsWidget extends Component {
     };
 
     /**
-     * Fetch LeetCode data using GraphQL API
+     * Fetch LeetCode data using API proxy to avoid CORS
      */
     fetchLeetcodeData = async () => {
         try {
             const username = 'Nishant-iith';
 
-            // Temporary fallback due to potential CORS issues with LeetCode GraphQL
-            // Return the known data from our previous test
-            console.log('Using fallback LeetCode data due to potential CORS restrictions');
-            const result = {
+            console.log('Fetching LeetCode data via API proxy for:', username);
+
+            // Use our serverless API proxy to avoid CORS issues
+            const response = await fetch(`/api/leetcode?username=${username}`);
+
+            if (!response.ok) {
+                throw new Error(`API returned ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            if (result.isFallback) {
+                console.warn('Using fallback LeetCode data:', result);
+            } else {
+                console.log('LeetCode data fetched successfully:', result);
+            }
+
+            return result;
+        } catch (error) {
+            console.error('LeetCode API proxy failed:', error);
+            // Return minimal fallback data on complete failure
+            return {
                 totalSolved: 349,
                 easy: 93,
                 medium: 195,
@@ -168,120 +186,8 @@ export class CodeStatsWidget extends Component {
                 contestsAttended: 8,
                 recentAccepted: 9,
                 totalSubmissions: 497,
-                realName: 'Nishant'
-            };
-            console.log('LeetCode fallback data:', result);
-            return result;
-
-            // Original API code (commented out due to CORS)
-            /*
-            const url = 'https://leetcode.com/graphql';
-            console.log('Fetching LeetCode data for:', username);
-
-            // Comprehensive query based on leetcode-fetcher.js
-            const query = `
-            query getUserProfile($username: String!) {
-                matchedUser(username: $username) {
-                    username
-                    profile {
-                        realName
-                        reputation
-                        ranking
-                    }
-                    submitStats: submitStatsGlobal {
-                        acSubmissionNum {
-                            difficulty
-                            count
-                            submissions
-                        }
-                    }
-                    languageProblemCount {
-                        languageName
-                        problemsSolved
-                    }
-                }
-                userContestRanking(username: $username) {
-                    attendedContestsCount
-                    rating
-                    topPercentage
-                }
-                recentSubmissions: recentSubmissionList(username: $username, limit: 10) {
-                    title
-                    timestamp
-                    statusDisplay
-                }
-            }`;
-
-            const variables = { username };
-
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    query,
-                    variables
-                })
-            });
-
-            const data = await response.json();
-            console.log('LeetCode API response:', data);
-
-            if (!data.data || !data.data.matchedUser) {
-                console.warn('LeetCode user not found or API returned unexpected format');
-                throw new Error('User not found');
-            }
-
-            const user = data.data.matchedUser;
-            const contestRanking = data.data.userContestRanking;
-            const recentSubmissions = data.data.recentSubmissions || [];
-
-            const stats = user.submitStats.acSubmissionNum;
-            const totalStats = stats.find(s => s.difficulty === 'All');
-            const easyStats = stats.find(s => s.difficulty === 'Easy');
-            const mediumStats = stats.find(s => s.difficulty === 'Medium');
-            const hardStats = stats.find(s => s.difficulty === 'Hard');
-
-            // Calculate last 30 days activity
-            const thirtyDaysAgo = Date.now() / 1000 - (30 * 24 * 60 * 60);
-            const recentAccepted = recentSubmissions.filter(sub =>
-                parseInt(sub.timestamp) >= thirtyDaysAgo &&
-                sub.statusDisplay === 'Accepted'
-            ).length;
-
-            const result = {
-                totalSolved: totalStats ? totalStats.count : 0,
-                easy: easyStats ? easyStats.count : 0,
-                medium: mediumStats ? mediumStats.count : 0,
-                hard: hardStats ? hardStats.count : 0,
-                username: user.username,
-                reputation: user.profile.reputation || 0,
-                ranking: user.profile.ranking || null,
-                contestRating: contestRanking ? Math.round(contestRanking.rating) : null,
-                contestsAttended: contestRanking ? contestRanking.attendedContestsCount : 0,
-                recentAccepted,
-                totalSubmissions: totalStats ? totalStats.submissions : 0,
-                realName: user.profile.realName
-            };
-            console.log('LeetCode data processed successfully:', result);
-            return result;
-            */
-        } catch (error) {
-            console.warn('LeetCode fetch failed:', error);
-            return {
-                totalSolved: 0,
-                easy: 0,
-                medium: 0,
-                hard: 0,
-                username: 'Nishant-iith',
-                reputation: 0,
-                ranking: null,
-                contestRating: null,
-                contestsAttended: 0,
-                recentAccepted: 0,
-                totalSubmissions: 0,
-                realName: null
+                realName: 'Nishant',
+                isFallback: true
             };
         }
     };
@@ -804,16 +710,19 @@ export class CodeStatsWidget extends Component {
     render() {
         const { isExpanded, position, isDragging } = this.state;
 
-        // Widget positioning and sizing - lower z-index to stay behind windows
+        // Widget positioning and sizing - responsive breakpoints for mobile
         const baseClasses = "absolute z-10 transition-all duration-300 ease-in-out";
         const sizeClasses = isExpanded
-            ? "w-[55vw] h-[75vh]"
-            : "w-[20vw] h-[40vh]";
+            ? "w-[90vw] sm:w-[75vw] md:w-[65vw] lg:w-[55vw] h-[85vh] sm:h-[80vh] md:h-[75vh]"
+            : "w-[45vw] sm:w-[35vw] md:w-[25vw] lg:w-[20vw] h-[50vh] sm:h-[45vh] md:h-[40vh]";
 
         const positionStyle = isExpanded
             ? {
-                left: '22.5vw',
-                top: '12.5vh'
+                left: '5vw',
+                top: '7.5vh',
+                '@media (min-width: 640px)': { left: '12.5vw', top: '10vh' },
+                '@media (min-width: 768px)': { left: '17.5vw', top: '12.5vh' },
+                '@media (min-width: 1024px)': { left: '22.5vw' }
             }
             : {
                 left: `${position.x}px`,
@@ -824,7 +733,8 @@ export class CodeStatsWidget extends Component {
         return (
             <div
                 ref={this.widgetRef}
-                className={`${baseClasses} ${sizeClasses} ${isDragging ? 'select-none' : ''}`}
+                className={`${baseClasses} ${sizeClasses} ${isDragging ? 'select-none' : ''}
+                    ${!isExpanded ? 'min-w-[180px]' : ''}`}
                 style={positionStyle}
                 onMouseDown={this.handleMouseDown}
             >

@@ -14,10 +14,15 @@ const nextConfig = {
   trailingSlash: true,
 
   // Image optimization
+  // Enable optimization for development and production (Vercel/serverful)
+  // Disable only for GitHub Pages static export
   images: {
-    unoptimized: true,
-    domains: [],
+    unoptimized: isProd && isGitHubPages, // Only unoptimized for GitHub Pages
+    domains: ['raw.githubusercontent.com', 'avatars.githubusercontent.com'],
     formats: ['image/webp', 'image/avif'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    minimumCacheTTL: 60,
   },
 
   // Environment variables validation

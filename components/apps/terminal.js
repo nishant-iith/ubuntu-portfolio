@@ -267,7 +267,7 @@ const Terminal = ({ addFolder, openApp }) => {
                 output = `Available Commands:
 Navigation:  cd, ls, pwd, clear, exit
 File ops:    cat, mkdir, echo
-Apps:        about-nishant, todoist, settings, sendmsg
+Apps:        about-nishant, settings, sendmsg
 System:      help, whoami, date, uptime
 Fun:         sudo, cowsay`;
                 break;
@@ -396,12 +396,7 @@ Fun:         sudo, cowsay`;
                 break;
 
             case 'todoist':
-                if (openApp) {
-                    openApp('todo-ist');
-                    output = 'Opening Todoist...';
-                } else {
-                    output = 'todoist: command not available';
-                }
+                output = 'todoist: command removed. Try "github" or "about-nishant" instead.';
                 break;
 
             case 'settings':
@@ -466,7 +461,7 @@ Fun:         sudo, cowsay`;
     const getCommandSuggestions = useCallback((partial) => {
         const commands = [
             'help', 'whoami', 'date', 'uptime', 'clear', 'exit', 'pwd', 'cd', 'ls', 'cat',
-            'echo', 'mkdir', 'sudo', 'cowsay', 'about-nishant', 'todoist', 'settings', 'sendmsg'
+            'echo', 'mkdir', 'sudo', 'cowsay', 'about-nishant', 'settings', 'sendmsg'
         ];
         return commands.filter(cmd => cmd.startsWith(partial.toLowerCase()));
     }, []);

@@ -113,14 +113,31 @@ export class Desktop extends Component {
         let { posx, posy } = this.getMenuPosition(e);
         let contextMenu = document.getElementById(`${menuName}-menu`);
 
-        if (posx + $(contextMenu).width() > window.innerWidth) posx -= $(contextMenu).width();
-        if (posy + $(contextMenu).height() > window.innerHeight) posy -= $(contextMenu).height();
+        if (!contextMenu) return;
 
-        posx = posx.toString() + "px";
-        posy = posy.toString() + "px";
+        // Get menu dimensions (fallback to default if not yet rendered)
+        const menuWidth = contextMenu.offsetWidth || 208; // w-52 = 13rem = 208px
+        const menuHeight = contextMenu.offsetHeight || 300;
 
-        contextMenu.style.left = posx;
-        contextMenu.style.top = posy;
+        // Add padding for mobile devices
+        const padding = window.innerWidth < 768 ? 10 : 0;
+
+        // Prevent overflow on right edge
+        if (posx + menuWidth + padding > window.innerWidth) {
+            posx = window.innerWidth - menuWidth - padding;
+        }
+
+        // Prevent overflow on bottom edge
+        if (posy + menuHeight + padding > window.innerHeight) {
+            posy = window.innerHeight - menuHeight - padding;
+        }
+
+        // Ensure menu doesn't go off left or top edges
+        posx = Math.max(padding, posx);
+        posy = Math.max(padding, posy);
+
+        contextMenu.style.left = posx + "px";
+        contextMenu.style.top = posy + "px";
 
         this.setState({ context_menus: { ...this.state.context_menus, [menuName]: true } });
     }
