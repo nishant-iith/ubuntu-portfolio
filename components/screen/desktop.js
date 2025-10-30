@@ -9,7 +9,6 @@ import DesktopMenu from '../context menus/desktop-menu';
 import DefaultMenu from '../context menus/default';
 import CodeStatsWidget from '../widgets/CodeStatsWidget';
 import ErrorBoundary from '../ErrorBoundary';
-import $ from 'jquery';
 import ReactGA from 'react-ga4';
 
 export class Desktop extends Component {

@@ -20,9 +20,11 @@ const FlameApp = () => {
         allowFullScreen
         onError={(e) => {
           console.warn('Failed to load API Sandbox:', e);
-          e.target.style.background = '#333';
-          e.target.style.color = '#fff';
-          e.target.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-family:Ubuntu,sans-serif;">Failed to load API Sandbox</div>';
+          // Safely handle error by replacing the iframe with a div instead of using innerHTML
+          const errorDiv = document.createElement('div');
+          errorDiv.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100%;font-family:Ubuntu,sans-serif;background:#333;color:#fff;';
+          errorDiv.textContent = 'Failed to load API Sandbox';
+          e.target.parentNode.replaceChild(errorDiv, e.target);
         }}
       />
     </div>

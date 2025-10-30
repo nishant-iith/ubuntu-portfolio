@@ -19,6 +19,19 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Username is required' });
     }
 
+    // Validate and sanitize username input
+    if (typeof username !== 'string') {
+        return res.status(400).json({ error: 'Invalid username format' });
+    }
+
+    // Remove potentially dangerous characters and validate format
+    const sanitizedUsername = username.trim().replace(/[<>\"'&]/g, '');
+
+    // LeetCode usernames are alphanumeric with hyphens and underscores only
+    if (!/^[a-zA-Z0-9_-]+$/.test(sanitizedUsername) || sanitizedUsername.length > 35) {
+        return res.status(400).json({ error: 'Invalid username format' });
+    }
+
     try {
         const url = 'https://leetcode.com/graphql';
 
@@ -52,7 +65,7 @@ export default async function handler(req, res) {
             }
         }`;
 
-        const variables = { username };
+        const variables = { username: sanitizedUsername };
 
         const response = await fetch(url, {
             method: 'POST',
@@ -125,7 +138,7 @@ export default async function handler(req, res) {
             easy: 93,
             medium: 195,
             hard: 61,
-            username: username,
+            username: sanitizedUsername,
             reputation: 0,
             ranking: null,
             contestRating: 1500,

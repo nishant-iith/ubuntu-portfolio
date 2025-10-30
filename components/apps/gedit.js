@@ -1,5 +1,4 @@
-import React, { Component } from 'react';
-import $ from 'jquery';
+import React, { Component, createRef } from 'react';
 import ReactGA from 'react-ga4';
 import emailjs from '@emailjs/browser';
 
@@ -10,6 +9,11 @@ export class Gedit extends Component {
         this.state = {
             sending: false,
         }
+
+        // Create refs for form elements
+        this.nameRef = createRef();
+        this.subjectRef = createRef();
+        this.messageRef = createRef();
     }
 
     componentDidMount() {
@@ -17,9 +21,9 @@ export class Gedit extends Component {
     }
 
     sendMessage = async () => {
-        let name = $("#sender-name").val();
-        let subject = $("#sender-subject").val();
-        let message = $("#sender-message").val();
+        let name = this.nameRef.current.value;
+        let subject = this.subjectRef.current.value;
+        let message = this.messageRef.current.value;
 
         name = name.trim();
         subject = subject.trim();
@@ -28,14 +32,14 @@ export class Gedit extends Component {
         let error = false;
 
         if (name.length === 0) {
-            $("#sender-name").val('');
-            $("#sender-name").attr("placeholder", "Name must not be Empty!");
+            this.nameRef.current.value = '';
+            this.nameRef.current.placeholder = 'Name must not be Empty!';
             error = true;
         }
 
         if (message.length === 0) {
-            $("#sender-message").val('');
-            $("#sender-message").attr("placeholder", "Message must not be Empty!");
+            this.messageRef.current.value = '';
+            this.messageRef.current.placeholder = 'Message must not be Empty!';
             error = true;
         }
         if (error) return;
@@ -52,10 +56,16 @@ export class Gedit extends Component {
 
         emailjs.send(serviceID, templateID, templateParams).then(() => {
             this.setState({ sending: false });
-            $("#close-gedit").trigger("click");
+            // Call the close function from props if available
+            if (this.props.close) {
+                this.props.close();
+            }
         }).catch(() => {
             this.setState({ sending: false });
-            $("#close-gedit").trigger("click");
+            // Call the close function from props if available
+            if (this.props.close) {
+                this.props.close();
+            }
         })
 
         ReactGA.event({
@@ -77,15 +87,15 @@ export class Gedit extends Component {
                 <div className="relative flex-grow flex flex-col bg-ub-gedit-dark font-normal windowMainScreen">
                     <div className="absolute left-0 top-0 h-full px-2 bg-ub-gedit-darker"></div>
                     <div className="relative">
-                        <input id="sender-name" className=" w-full text-ubt-gedit-orange focus:bg-ub-gedit-light outline-none font-medium text-sm pl-6 py-0.5 bg-transparent" placeholder="Your Email / Name :" spellCheck="false" autoComplete="off" type="text" />
+                        <input ref={this.nameRef} className=" w-full text-ubt-gedit-orange focus:bg-ub-gedit-light outline-none font-medium text-sm pl-6 py-0.5 bg-transparent" placeholder="Your Email / Name :" spellCheck="false" autoComplete="off" type="text" />
                         <span className="absolute left-1 top-1/2 transform -translate-y-1/2 font-bold light text-sm text-ubt-gedit-blue">1</span>
                     </div>
                     <div className="relative">
-                        <input id="sender-subject" className=" w-full my-1 text-ubt-gedit-blue focus:bg-ub-gedit-light gedit-subject outline-none text-sm font-normal pl-6 py-0.5 bg-transparent" placeholder="subject (may be a feedback for this website!)" spellCheck="false" autoComplete="off" type="text" />
+                        <input ref={this.subjectRef} className=" w-full my-1 text-ubt-gedit-blue focus:bg-ub-gedit-light gedit-subject outline-none text-sm font-normal pl-6 py-0.5 bg-transparent" placeholder="subject (may be a feedback for this website!)" spellCheck="false" autoComplete="off" type="text" />
                         <span className="absolute left-1 top-1/2 transform -translate-y-1/2 font-bold  text-sm text-ubt-gedit-blue">2</span>
                     </div>
                     <div className="relative flex-grow">
-                        <textarea id="sender-message" className=" w-full gedit-message font-light text-sm resize-none h-full windowMainScreen outline-none tracking-wider pl-6 py-1 bg-transparent" placeholder="Message" spellCheck="false" autoComplete="none" type="text" />
+                        <textarea ref={this.messageRef} className=" w-full gedit-message font-light text-sm resize-none h-full windowMainScreen outline-none tracking-wider pl-6 py-1 bg-transparent" placeholder="Message" spellCheck="false" autoComplete="none" type="text" />
                         <span className="absolute left-1 top-1 font-bold  text-sm text-ubt-gedit-blue">3</span>
                     </div>
                 </div>
