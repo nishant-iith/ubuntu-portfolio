@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import BackgroundImage from '../util components/background-image';
 import BottomDock from './bottom_dock';
-import LoadingSpinner from '../LoadingSpinner';
 import apps from '../../apps.config';
 import Window from '../base/window';
 import UbuntuApp from '../base/ubuntu_app';
@@ -35,7 +34,6 @@ export class Desktop extends Component {
                 default: false,
             },
             showNameBar: false,
-            isLoading: false,
         }
     }
 
