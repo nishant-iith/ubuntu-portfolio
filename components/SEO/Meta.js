@@ -44,7 +44,10 @@ export default function Meta() {
             <meta property="og:locale" content="en_IN" />
             <meta property="og:type" content="website" />
 
-            <link rel="icon" href="/images/logos/fevicon.svg" />
+            {/* Favicon - Using correct path */}
+            <link rel="icon" type="image/svg+xml" href="/fevicon.svg" />
+            <link rel="icon" href="/fevicon.svg" />
+            <link rel="icon" type="image/png" href="/fevicon.png" />
             <link rel="apple-touch-icon" href="/images/logos/logo.png" />
         </Head>
     )

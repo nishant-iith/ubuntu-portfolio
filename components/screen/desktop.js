@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import BackgroundImage from '../util components/background-image';
 import BottomDock from './bottom_dock';
+import LoadingSpinner from '../LoadingSpinner';
 import apps from '../../apps.config';
 import Window from '../base/window';
 import UbuntuApp from '../base/ubuntu_app';
@@ -8,6 +9,7 @@ import AllApplications from '../screen/all-applications'
 import DesktopMenu from '../context menus/desktop-menu';
 import DefaultMenu from '../context menus/default';
 import CodeStatsWidget from '../widgets/CodeStatsWidget';
+import ErrorBoundary from '../ErrorBoundary';
 import $ from 'jquery';
 import ReactGA from 'react-ga4';
 
@@ -33,6 +35,7 @@ export class Desktop extends Component {
                 default: false,
             },
             showNameBar: false,
+            isLoading: true,
         }
     }
 
@@ -44,6 +47,11 @@ export class Desktop extends Component {
         this.setContextListeners();
         this.setEventListeners();
         this.checkForNewFolders();
+
+        // Set loading to false after initialization
+        setTimeout(() => {
+            this.setState({ isLoading: false });
+        }, 1000); // 1 second delay to show loading spinner
     }
 
     componentWillUnmount() {
@@ -514,6 +522,11 @@ export class Desktop extends Component {
     }
 
     render() {
+        // Show loading spinner during initial load
+        if (this.state.isLoading) {
+            return <LoadingSpinner message="Initializing Ubuntu desktop..." />;
+        }
+
         return (
             <div className={" h-full w-full flex flex-col items-end justify-start content-start flex-wrap-reverse pt-8 bg-transparent relative overflow-hidden overscroll-none window-parent"}>
 
@@ -558,7 +571,12 @@ export class Desktop extends Component {
                         openApp={this.openApp} /> : null}
 
                 {/* CodeStats Widget - Always visible */}
-                <CodeStatsWidget />
+                <ErrorBoundary
+                    fallbackMessage="Code stats widget failed to load. This might be due to API issues."
+                    onRetry={() => window.location.reload()}
+                >
+                    <CodeStatsWidget />
+                </ErrorBoundary>
 
             </div>
         )

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import ReactGA from 'react-ga4';
+import ErrorBoundary from '../ErrorBoundary';
 
 const Terminal = ({ addFolder, openApp }) => {
     // Terminal state
@@ -139,6 +140,16 @@ const Terminal = ({ addFolder, openApp }) => {
         return current;
     }, [currentPath, fileSystem]);
 
+    // Sanitize and escape text for safe display
+    const sanitizeText = useCallback((text) => {
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#x27;');
+    }, []);
+
     // Navigate to directory
     const navigateToDirectory = useCallback((dirName) => {
         if (dirName === '' || dirName === '~') {
@@ -164,8 +175,8 @@ const Terminal = ({ addFolder, openApp }) => {
             return { success: true };
         }
 
-        return { success: false, error: `bash: cd: ${dirName}: No such file or directory` };
-    }, [currentPath, currentDir, getCurrentDirectory]);
+        return { success: false, error: `bash: cd: ${sanitizeText(dirName)}: No such file or directory` };
+    }, [currentPath, currentDir, getCurrentDirectory, sanitizeText]);
 
     // List directory contents
     const listDirectory = useCallback((targetDir = null) => {
@@ -181,27 +192,19 @@ const Terminal = ({ addFolder, openApp }) => {
         } else if (target === 'root' || fileSystem.root.children[target]) {
             targetContents = fileSystem.root.children[target]?.children || fileSystem.root.children;
         } else {
-            return { success: false, error: `ls: cannot access '${target}': No such file or directory` };
+            return { success: false, error: `ls: cannot access '${sanitizeText(target)}': No such file or directory` };
         }
 
         const items = Object.keys(targetContents).map(name => {
             const item = targetContents[name];
             const className = item.type === 'directory' ? 'text-ubt-blue font-bold' : 'text-ubt-green';
-            return `<span class="${className} mr-4 mb-1 inline-block">${name}</span>`;
+            // Sanitize filename to prevent XSS
+            const sanitizedName = sanitizeText(name);
+            return `<span class="${className} mr-4 mb-1 inline-block">${sanitizedName}</span>`;
         });
 
         return { success: true, output: `<div class="flex flex-wrap gap-1">${items.join('')}</div>` };
-    }, [currentDir, getCurrentDirectory, fileSystem]);
-
-    // Sanitize and escape text for safe display
-    const sanitizeText = useCallback((text) => {
-        return text
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#x27;');
-    }, []);
+    }, [currentDir, getCurrentDirectory, fileSystem, sanitizeText]);
 
     // Advanced command parsing with support for quotes and escaping
     const parseCommand = useCallback((input) => {
@@ -289,7 +292,7 @@ Fun:         sudo, cowsay`;
                 break;
 
             case 'cowsay':
-                const message = args.join(' ') || 'Hello from Ubuntu Terminal!';
+                const message = sanitizeText(args.join(' ') || 'Hello from Ubuntu Terminal!');
                 output = `
  ${'_'.repeat(message.length + 2)}
 < ${message} >
@@ -349,7 +352,7 @@ Fun:         sudo, cowsay`;
                     if (currentDirContents[filename] && currentDirContents[filename].type === 'file') {
                         output = currentDirContents[filename].content;
                     } else {
-                        output = `cat: ${filename}: No such file or directory`;
+                        output = `cat: ${sanitizeText(filename)}: No such file or directory`;
                     }
                 }
                 break;
@@ -629,5 +632,12 @@ Terminal.propTypes = {
 export default Terminal;
 
 export const displayTerminal = (addFolder, openApp) => {
-    return <Terminal addFolder={addFolder} openApp={openApp} />;
+    return (
+        <ErrorBoundary
+            fallbackMessage="Terminal encountered an error. Please restart the terminal."
+            onRetry={() => window.location.reload()}
+        >
+            <Terminal addFolder={addFolder} openApp={openApp} />
+        </ErrorBoundary>
+    );
 };
