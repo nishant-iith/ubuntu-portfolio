@@ -35,7 +35,7 @@ export class Desktop extends Component {
                 default: false,
             },
             showNameBar: false,
-            isLoading: true,
+            isLoading: false,
         }
     }
 
@@ -47,11 +47,6 @@ export class Desktop extends Component {
         this.setContextListeners();
         this.setEventListeners();
         this.checkForNewFolders();
-
-        // Set loading to false after initialization
-        setTimeout(() => {
-            this.setState({ isLoading: false });
-        }, 1000); // 1 second delay to show loading spinner
     }
 
     componentWillUnmount() {
@@ -522,11 +517,6 @@ export class Desktop extends Component {
     }
 
     render() {
-        // Show loading spinner during initial load
-        if (this.state.isLoading) {
-            return <LoadingSpinner message="Initializing Ubuntu desktop..." />;
-        }
-
         return (
             <div className={" h-full w-full flex flex-col items-end justify-start content-start flex-wrap-reverse pt-8 bg-transparent relative overflow-hidden overscroll-none window-parent"}>
 

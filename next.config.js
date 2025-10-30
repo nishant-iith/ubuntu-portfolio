@@ -5,7 +5,7 @@ const isProd = process.env.NODE_ENV === 'production';
 const isGitHubPages = process.env.GITHUB_PAGES === 'true';
 
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false, // Disabled to prevent double-rendering in development
   swcMinify: true,
 
   // Performance optimizations
