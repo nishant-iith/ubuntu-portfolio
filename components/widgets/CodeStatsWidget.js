@@ -100,11 +100,30 @@ const CodeStatsWidget = () => {
     }, []);
 
     /**
-     * Fetch GitHub data using GitHub API
+     * Fetch GitHub data using GitHub API with 15-minute caching
      */
     const fetchGithubData = useCallback(async () => {
+        const username = 'nishant-iith';
+        const cacheKey = `githubData_${username}`;
+        const cacheTimestampKey = `githubDataTimestamp_${username}`;
+        const CACHE_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
+
+        // Check if we have cached data
+        if (typeof window !== 'undefined') {
+            const cachedData = localStorage.getItem(cacheKey);
+            const cachedTimestamp = localStorage.getItem(cacheTimestampKey);
+
+            if (cachedData && cachedTimestamp) {
+                const timeDiff = Date.now() - parseInt(cachedTimestamp);
+                if (timeDiff < CACHE_DURATION) {
+                    console.log('Using cached GitHub data, time until refresh:', Math.ceil((CACHE_DURATION - timeDiff) / 1000 / 60), 'minutes');
+                    return JSON.parse(cachedData);
+                }
+            }
+        }
+
         try {
-            const username = 'nishant-iith';
+            console.log('Fetching fresh GitHub data...');
             const userResponse = await fetch(`https://api.github.com/users/${username}`);
 
             if (!userResponse.ok) {
@@ -121,14 +140,33 @@ const CodeStatsWidget = () => {
             const repos = await reposResponse.json();
             const totalStars = repos.reduce((sum, repo) => sum + repo.stargazers_count, 0);
 
-            return {
+            const githubData = {
                 username: userData.login,
                 publicRepos: userData.public_repos,
                 followers: userData.followers,
                 totalStars,
             };
+
+            // Cache the data
+            if (typeof window !== 'undefined') {
+                localStorage.setItem(cacheKey, JSON.stringify(githubData));
+                localStorage.setItem(cacheTimestampKey, Date.now().toString());
+                console.log('GitHub data cached for 15 minutes');
+            }
+
+            return githubData;
         } catch (error) {
             console.warn('GitHub fetch failed:', error);
+
+            // If API fails and we have cached data, use it even if expired
+            if (typeof window !== 'undefined') {
+                const cachedData = localStorage.getItem(cacheKey);
+                if (cachedData) {
+                    console.log('API failed, using expired cached data');
+                    return JSON.parse(cachedData);
+                }
+            }
+
             throw error;
         }
     }, []);
@@ -286,8 +324,40 @@ const CodeStatsWidget = () => {
         setIsMinimized(!isMinimized);
     };
 
-    const handleRefresh = () => {
+    const handleRefresh = (forceRefresh = false) => {
+        if (forceRefresh) {
+            clearGitHubCache();
+        }
         fetchAllData();
+    };
+
+    /**
+     * Cache management functions
+     */
+    const clearGitHubCache = () => {
+        if (typeof window !== 'undefined') {
+            const username = 'nishant-iith';
+            localStorage.removeItem(`githubData_${username}`);
+            localStorage.removeItem(`githubDataTimestamp_${username}`);
+            console.log('GitHub cache cleared');
+        }
+    };
+
+    const getCacheInfo = () => {
+        if (typeof window !== 'undefined') {
+            const username = 'nishant-iith';
+            const cacheTimestamp = localStorage.getItem(`githubDataTimestamp_${username}`);
+            if (cacheTimestamp) {
+                const timeDiff = Date.now() - parseInt(cacheTimestamp);
+                const timeRemaining = Math.max(0, 15 * 60 * 1000 - timeDiff);
+                return {
+                    isCached: true,
+                    timeRemaining: Math.ceil(timeRemaining / 1000 / 60), // minutes
+                    age: Math.ceil(timeDiff / 1000 / 60) // minutes
+                };
+            }
+        }
+        return { isCached: false, timeRemaining: 0, age: 0 };
     };
 
     /**
